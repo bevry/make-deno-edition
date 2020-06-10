@@ -37,6 +37,12 @@ Make a deno edition of a npm package
 
 [Complete API Documentation.](http://master.make-deno-edition.bevry.surge.sh/docs/globals.html)
 
+### Examples
+
+Here is a list of Bevry packages that have used `make-deno-edition` to make themselves compatible with deno:
+
+-   https://github.com/bevry/badges
+
 ### Prerequisites
 
 You will be running `make-deno-edition` on a npm package that is written in TypeScript and uses ESM.
