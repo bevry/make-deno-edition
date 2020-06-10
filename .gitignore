@@ -1,0 +1,50 @@
+# 2020 May 12
+# https://github.com/bevry/base
+
+# System Files
+**/.DS_Store
+
+# Temp Files
+**/.docpad.db
+**/*.log
+**/*.cpuprofile
+**/*.heapsnapshot
+
+# Editor Files
+.c9/
+.vscode/
+
+# Private Files
+.env
+.idea
+.cake_task_cache
+
+# Build Caches
+build/
+bower_components/
+node_modules/
+.next/
+.pnp/
+.pnp.js
+
+# -------------------------------------
+# CDN Inclusions, Git Exclusions
+
+# Build Outputs
+**/out.*
+**/*.out.*
+**/out/
+**/output/
+*compiled*
+edition*/
+coffeejs/
+coffee/
+es5/
+es2015/
+esnext/
+docs/
+
+# =====================================
+# CUSTOM
+
+.now
