@@ -41,6 +41,7 @@ Make a deno edition of a npm package
 
 Here is a list of Bevry packages that have used `make-deno-edition` to make themselves compatible with deno:
 
+-   https://github.com/bevry/arrangekeys
 -   https://github.com/bevry/badges
 
 ### Prerequisites
