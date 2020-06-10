@@ -329,6 +329,8 @@ export async function make({
 	)
 
 	// prepare
+	const denoEditionDirectory = 'edition-deno'
+	const denoEditionPath = join(cwd, denoEditionDirectory)
 	const nm = join(cwd, 'node_modules')
 	const deps: Dependencies = pkg.dependencies || {}
 	const devDeps: Dependencies = pkg.devDependencies || {}
@@ -353,7 +355,7 @@ export async function make({
 	const filenames = (await api.withPromise()) as string[]
 
 	// delete the old files
-	await rimrafp(join(cwd, 'edition-deno'))
+	await rimrafp(denoEditionPath)
 
 	// convert all the files
 	let fail: Error | undefined
@@ -414,7 +416,7 @@ export async function make({
 			}
 		} else {
 			// write the new files
-			const denoPath = join(cwd, 'deno-edition', filename)
+			const denoPath = join(denoEditionPath, filename)
 			log.status(`writing [${denoPath}]...`)
 			await ensureFile(denoPath, result)
 			log.status(`...wrote [${denoPath}]`)
@@ -422,7 +424,9 @@ export async function make({
 	}
 
 	// delete deno edition, will be re-added later if it is suitable
-	pkg.editions = pkg.editions.filter((e: any) => e.directory !== 'edition-deno')
+	pkg.editions = pkg.editions.filter(
+		(e: any) => e.directory !== denoEditionDirectory
+	)
 
 	// failure
 	if (fail) {
@@ -440,7 +444,7 @@ export async function make({
 		// add deno edition
 		const denoEdition = {
 			description: 'TypeScript source code made to be compatible with Deno',
-			directory: 'edition-deno',
+			directory: denoEditionDirectory,
 			entry: sourceEdition.entry,
 			tags: ['typescript', 'import', 'deno'],
 			engines: {
