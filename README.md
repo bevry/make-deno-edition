@@ -55,6 +55,7 @@ Here is a list of Bevry packages that have used `make-deno-edition` to make them
 -   https://github.com/bevry/oneday
 -   https://github.com/bevry/remove-indentation
 -   https://github.com/bevry/sortobject
+-   https://github.com/bevry/textextensions
 
 ### Prerequisites
 
