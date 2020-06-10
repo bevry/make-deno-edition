@@ -53,6 +53,7 @@ Here is a list of Bevry packages that have used `make-deno-edition` to make them
 -   https://github.com/bevry/native-promise-pool
 -   https://github.com/bevry/normalify
 -   https://github.com/bevry/oneday
+-   https://github.com/bevry/remove-indentation
 
 ### Prerequisites
 
