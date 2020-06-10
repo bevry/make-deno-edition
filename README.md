@@ -62,7 +62,7 @@ You will be running `make-deno-edition` on a npm package that is written in Type
 Any imports from your package must either:
 
 - be a relative import, that has a corresponding `.ts` file
-- be a URL that a resolves to a ts file (typical deno style)
+- be a URL that a resolves to a `.ts` file (typical deno style)
 - be a dependency that has a `package.json` file, that contains a `deno` entry field, or a `main` field that has a corresponding `.ts` file
 - where a custom package entry was used, there is a corresponding `.ts` file, or a `deno` edition in the `package.json` file such that the deno entry can be inferred
 
