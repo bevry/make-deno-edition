@@ -1,5 +1,9 @@
 # History
 
+## v0.2.2 2020 June 10
+
+-   Fixed package imports that have a `deno` entry
+
 ## v0.2.1 2020 June 10
 
 -   Now supports nested files

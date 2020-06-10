@@ -253,7 +253,7 @@ export async function convert(opts: ConvertOpts): Promise<Error | string> {
 						)
 						log.warn(error)
 					}
-					imports[source] = [match, error || resolvedEntry]
+					imports[source] = [match, error || target]
 					continue
 				} catch (error) {
 					imports[source] = [match, error]
