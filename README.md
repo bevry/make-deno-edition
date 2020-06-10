@@ -50,6 +50,9 @@ Here is a list of Bevry packages that have used `make-deno-edition` to make them
 -   https://github.com/bevry/fellow
 -   https://github.com/bevry/ignorepatterns
 -   https://github.com/bevry/links
+-   https://github.com/bevry/native-promise-pool
+-   https://github.com/bevry/normalify
+-   https://github.com/bevry/oneday
 
 ### Prerequisites
 
