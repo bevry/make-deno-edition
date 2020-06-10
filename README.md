@@ -72,10 +72,10 @@ You will be running `make-deno-edition` on a npm package that is written in Type
 
 Any imports from your package must either:
 
-- be a relative import, that has a corresponding `.ts` file
-- be a URL that a resolves to a `.ts` file (typical deno style)
-- be a dependency that has a `package.json` file, that contains a `deno` entry field, or a `main` field that has a corresponding `.ts` file
-- where a custom package entry was used, there is a corresponding `.ts` file, or a `deno` edition in the `package.json` file such that the deno entry can be inferred
+-   be a relative import, that has a corresponding `.ts` file
+-   be a URL that a resolves to a `.ts` file (typical deno style)
+-   be a dependency that has a `package.json` file, that contains a `deno` entry field, or a `main` field that has a corresponding `.ts` file
+-   where a custom package entry was used, there is a corresponding `.ts` file, or a `deno` edition in the `package.json` file such that the deno entry can be inferred
 
 If you import a package that is not compatible with deno, but does have source code written in TypeScript using ESM, then fork the imported package, run through the instructions below to generate the deno comptible edition for it, then submit a pull request, so that it has a deno compatible edition, and thus can be used automatically in the future.
 
