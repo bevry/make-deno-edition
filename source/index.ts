@@ -209,7 +209,7 @@ export async function convert(opts: ConvertOpts): Promise<Error | string> {
 		if (!entry && builtins.includes(dep)) {
 			// otherwise, probably node builtin, check for compat
 			if (compat.includes(dep)) {
-				target = `//deno.land/std/node/${dep}.ts`
+				target = `https://deno.land/std/node/${dep}.ts`
 				log.log(
 					`${path}: imports node builtin [${dep}] with compat at [${target}]`
 				)
@@ -241,7 +241,7 @@ export async function convert(opts: ConvertOpts): Promise<Error | string> {
 					const deno = depPkg?.deno
 					const main = depPkg?.main
 					const resolvedEntry = entry || deno || main
-					const target = `//unpkg.com/${dep}@${version}/${resolvedEntry}`
+					const target = `https://unpkg.com/${dep}@${version}/${resolvedEntry}`
 					log.log(`${path}: imports package [${target}]`)
 					if (!resolvedEntry.endsWith('.ts')) {
 						error = new Error(
