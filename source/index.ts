@@ -259,7 +259,7 @@ export async function convert(opts: ConvertOpts): Promise<Error | string> {
 
 			// uninstalled dependency
 			error = new Error(
-				`${path}: imports an unknown dependency [${dep}]: add it to pacakge.json and try again`
+				`${path}: imports an unknown dependency [${dep}]: add it to package.json and try again`
 			)
 			log.warn(error)
 			imports[source] = [match, error]
