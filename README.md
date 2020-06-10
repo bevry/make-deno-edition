@@ -47,6 +47,7 @@ Here is a list of Bevry packages that have used `make-deno-edition` to make them
 -   https://github.com/bevry/detect-indentation
 -   https://github.com/bevry/envfile
 -   https://github.com/bevry/errlop
+-   https://github.com/bevry/fellow
 
 ### Prerequisites
 
