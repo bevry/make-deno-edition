@@ -43,6 +43,7 @@ Here is a list of Bevry packages that have used `make-deno-edition` to make them
 
 -   https://github.com/bevry/arrangekeys
 -   https://github.com/bevry/badges
+-   https://github.com/bevry/binaryextensions
 
 ### Prerequisites
 
