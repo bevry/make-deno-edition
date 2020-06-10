@@ -1,5 +1,10 @@
 # History
 
+## v0.2.1 2020 June 10
+
+-   Now supports nested files
+-   Now supports circular imports
+
 ## v0.2.0 2020 June 10
 
 -   Updated dependencies, [base files](https://github.com/bevry/base), and [editions](https://editions.bevry.me) using [boundation](https://github.com/bevry/boundation)

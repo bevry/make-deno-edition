@@ -3,7 +3,6 @@ import fdir from 'fdir'
 import Errlop from 'errlop'
 import rimraf from 'rimraf'
 import mkdirp from 'mkdirp'
-import chalk from 'chalk'
 
 import { resolve, join, extname, dirname } from 'path'
 import { promises as fsPromises, exists as fsExists } from 'fs'
@@ -125,6 +124,7 @@ export async function convert(opts: ConvertOpts): Promise<Error | string> {
 	// get the file content
 	const sourceContent = await readFile(path, 'utf-8')
 	const imports: Imports = {}
+	const postponed: Array<() => Promise<void>> = []
 
 	// get the imports
 	const matches = sourceContent.matchAll(/ from ['"]([^'"]+)['"]/g)
@@ -161,16 +161,20 @@ export async function convert(opts: ConvertOpts): Promise<Error | string> {
 
 			// convert it premptively, to ensure it is also suitable
 			if (!error) {
-				const targetPath = resolve(dirname(path), target)
-				try {
-					await convert({ ...opts, path: targetPath })
-				} catch (err) {
-					error = new Errlop(
-						`${path}: failed to import [${source}] which we tried to resolve to [${targetPath}]`,
-						err
-					)
-					log.warn(error)
-				}
+				// queue the conversion of this file, after we have injected this file into the cache
+				postponed.push(async function () {
+					const targetPath = resolve(dirname(path), target)
+					try {
+						await convert({ ...opts, path: targetPath })
+					} catch (err) {
+						error = new Errlop(
+							`${path}: failed to import [${source}] which we tried to resolve to [${targetPath}]`,
+							err
+						)
+						log.warn(error)
+						imports[source] = [match, error]
+					}
+				})
 			}
 
 			// map
@@ -266,10 +270,26 @@ export async function convert(opts: ConvertOpts): Promise<Error | string> {
 		}
 	}
 
-	// swap out the imports with deno ones
-	let error: Error | undefined
-	let offset = 0
+	// check for errors
 	let resultContent = sourceContent
+	let error: Error | null = null
+	for (const [source, [match, result]] of Object.entries(imports)) {
+		if (result instanceof Error) {
+			error = new Errlop(result, error)
+			continue
+		}
+	}
+
+	// write to cache
+	cache[path] = error || resultContent
+
+	// do the postponed items
+	await Promise.all(postponed.map((p) => p()))
+
+	// now that locals (and thus possibly circular are added)
+	// which makes our conversions complete, do a
+	let offset = 0
+	error = null
 	for (const [source, [match, result]] of Object.entries(imports)) {
 		if (result instanceof Error) {
 			error = new Errlop(result, error)
@@ -286,14 +306,15 @@ export async function convert(opts: ConvertOpts): Promise<Error | string> {
 		offset += replacement.length - source.length
 	}
 
+	// write to cache
+	cache[path] = error || resultContent
+
 	// return
 	if (error) {
 		log.warn(`${path}: has incompatibilities:\n`, error.stack)
-		cache[path] = error
 		return error
 	} else {
 		log.success(`${path}: converted to deno successfully`)
-		cache[path] = resultContent
 		return resultContent
 	}
 }
@@ -350,9 +371,10 @@ export async function make({
 	// get the ts files of the source directory
 	const sourceEditionPath = join(cwd, pkg.editions[0].directory)
 	const api = new fdir()
+		.withFullPaths()
 		.filter((path) => path.endsWith('.ts'))
 		.crawl(sourceEditionPath)
-	const filenames = (await api.withPromise()) as string[]
+	const paths = (await api.withPromise()) as string[]
 
 	// delete the old files
 	await rimrafp(denoEditionPath)
@@ -360,8 +382,8 @@ export async function make({
 	// convert all the files
 	let fail: Error | undefined
 	const files: Files = {}
-	for (const filename of filenames) {
-		const path = join(sourceEditionPath, filename)
+	for (const path of paths) {
+		const filename = path.replace(sourceEditionPath + '/', '')
 		const result = await convert({ path, cache: files, nm, deps, devDeps })
 		if (result instanceof Error) {
 			if (filename === sourceEdition.entry) {
