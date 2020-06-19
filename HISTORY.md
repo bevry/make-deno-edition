@@ -1,5 +1,9 @@
 # History
 
+## v0.4.2 2020 June 20
+
+-   Fix non-functional typo
+
 ## v0.4.1 2020 June 20
 
 -   Fix thrown errors not being caught in v0.4.0

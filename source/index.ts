@@ -401,7 +401,7 @@ export async function make({
 				const main = pkg?.main
 				dep.entry = deno || main
 			} catch (err) {
-				// don't change success, as this dependnecy may not be actually be used
+				// don't change success, as this dependency may not be actually be used
 				dep.errors.add(
 					`dependency [${name}] does not appear installed, as [${path}] was not valid JSON, install the dependency and try again`
 				)
@@ -457,7 +457,7 @@ export async function make({
 				// bubble dep import errors
 				if (i.dep?.errors.size)
 					i.errors.add(
-						`import of dependnecy [${i.dep.name}] has incompatibilities`
+						`import of dependency [${i.dep.name}] has incompatibilities`
 					)
 				// bubble file import errors
 				if (i.file?.errors.size)
