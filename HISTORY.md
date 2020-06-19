@@ -1,5 +1,9 @@
 # History
 
+## v0.4.1 2020 June 20
+
+-   Fix thrown errors not being caught in v0.4.0
+
 ## v0.4.0 2020 June 20
 
 -   Add or remove the `package.json` keywords `deno`, `denoland`, `deno-entry`, and `deno-edition` based on successful deno compatibility

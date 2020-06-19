@@ -35,6 +35,7 @@ async function bin() {
 				'make-deno-edition: UNEXEPCTED FAILURE! Unable to make the deno edition, due to this unexpected error:'
 			)
 		)
+		console.log(color.inspect(err))
 		process.exitCode = 1
 	}
 }
