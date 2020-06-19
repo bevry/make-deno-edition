@@ -1,4 +1,4 @@
-/* eslint new-cap:0 */
+/* eslint new-cap:0, no-loop-func:0 */
 import fdir from 'fdir'
 import Errlop from 'errlop'
 import rimraf from 'rimraf'
@@ -7,7 +7,7 @@ import mkdirp from 'mkdirp'
 import { resolve, join, extname, dirname } from 'path'
 import { promises as fsPromises, exists as fsExists } from 'fs'
 
-import * as log from './log.js'
+import { inspect } from './log.js'
 
 async function rimrafp(p: string) {
 	return new Promise(function (resolve, reject) {
@@ -85,238 +85,227 @@ const compat = [
 	'util',
 ]
 
-export interface Dependencies {
-	[key: string]: string
+export interface CompatibilityStatus {
+	success: true
+	message: string
 }
 
-export interface Imports {
-	[key: string]: [RegExpMatchArray, Error | string]
+export interface Import {
+	/** The type of import:
+	 * - internal imports are mapped to their typescript file that should exist within the source directory
+	 * - remote imports are assumed to be compatible
+	 * - dep imports are mapped to a typescript entry, via manual entry, deno entry, or main entry
+	 * - builtin imports are proxied to their deno compat layer if available
+	 */
+	type: null | 'internal' | 'remote' | 'dep' | 'builtin'
+	sourceIndex: number
+	sourceStatement: string
+	sourceTarget: string
+	resultStatement?: string
+	resultTarget?: string
+	package?: string
+	entry?: string
+	dep?: Dependency
+	path?: string
+	file?: File
+	errors: Set<string>
+}
+
+export type Imports = Import[]
+
+export interface File {
+	/** absolute filesystem path */
+	path: string
+	/** relative to the package directory */
+	filename: string
+	/** deno edition path */
+	denoPath: string
+	/** source file content */
+	source: string
+	/** result file content */
+	result?: string
+	imports: Imports
+	errors: Set<string>
 }
 
 export interface Files {
-	[path: string]: Error | string
+	[path: string]: File
 }
 
-export interface ConvertOpts {
-	path: string
-	cache: Files
-	nm: string
+/** package.json dependencies and devDependencies fields */
+export interface DependencySemvers {
+	[key: string]: string
+}
+
+export interface Dependency {
+	name: string
+	version: string
+	// json: any
+	entry?: string
+	url: string
+	errors: Set<string>
+}
+
+export interface Dependencies {
+	[key: string]: Dependency
+}
+
+export interface Details {
+	files: Files
 	deps: Dependencies
-	devDeps: Dependencies
+	errors: Set<string>
+	warnings: Set<string>
 }
 
-export async function convert(opts: ConvertOpts): Promise<Error | string> {
+export function convert(path: string, details: Details): File {
 	// prepare
-	const { path, cache, nm, deps, devDeps } = opts
+	const file = details.files[path]
 
-	// check
-	const cachedResult = cache[path]
-	if (cachedResult) {
-		return cachedResult
-	}
-	if ((await exists(path)) === false) {
-		const error = new Error(`${path}: does not exist`)
-		cache[path] = error
-		log.warn(error)
-		return error
-	}
-
-	// get the file content
-	const sourceContent = await readFile(path, 'utf-8')
-	const imports: Imports = {}
-	const postponed: Array<() => Promise<void>> = []
-
-	// get the imports
-	const matches = sourceContent.matchAll(/ from ['"]([^'"]+)['"]/g)
+	// extract imports
+	const matches = file.source.matchAll(/ from ['"]([^'"]+)['"]/g)
 	for (const match of matches) {
-		// const index = match.index
-		const source = match[1]
-		let target = source
-		let error: Error | undefined
+		const i: Import = {
+			type: null,
+			sourceIndex: match.index!,
+			sourceStatement: match[0],
+			sourceTarget: match[1],
+			errors: new Set<string>(),
+		}
+		file.imports.push(i)
+	}
+
+	// check the compat of each import
+	for (const i of file.imports) {
+		const { sourceTarget } = i
 
 		// check if local dependency, if so, ensure .ts extension
 		// and ensure it is supported itself
-		if (source.startsWith('.')) {
-			log.log(`${path}: imports internal path [${source}]`)
+		if (sourceTarget.startsWith('.')) {
+			i.type = 'internal'
 
 			// ensure extension
-			if (source.endsWith('/')) {
-				target += 'index.ts'
-				log.log(`${path}: mapped [${source}] to [${target}]`)
+			if (sourceTarget.endsWith('/')) {
+				i.resultTarget = sourceTarget + 'index.ts'
 			} else {
-				const ext = extname(source)
+				const ext = extname(sourceTarget)
 				if (ext === '') {
-					target = source + '.ts'
-					log.log(`${path}: mapped [${source}] to [${target}]`)
-				} else if (ext === '.js') {
-					target = source.replace(ext, '.ts')
-					log.log(`${path}: mapped [${source}] to [${target}]`)
-				} else if (ext !== '.ts') {
-					error = new Error(
-						`${path}: imported [${source}] which had an unsupported extension of [${ext}]`
-					)
-					log.warn(error)
+					i.resultTarget = sourceTarget + '.ts'
+				} else if (ext) {
+					i.resultTarget = sourceTarget.replace(ext, '.ts')
 				}
 			}
 
-			// convert it premptively, to ensure it is also suitable
-			if (!error) {
-				// queue the conversion of this file, after we have injected this file into the cache
-				postponed.push(async function () {
-					const targetPath = resolve(dirname(path), target)
-					try {
-						await convert({ ...opts, path: targetPath })
-					} catch (err) {
-						error = new Errlop(
-							`${path}: failed to import [${source}] which we tried to resolve to [${targetPath}]`,
-							err
-						)
-						log.warn(error)
-						imports[source] = [match, error]
-					}
-				})
+			// check the path
+			i.path = resolve(dirname(path), i.resultTarget!)
+			i.file = details.files[i.path]
+			if (!i.file) {
+				i.errors.add(
+					`import of [${i.sourceTarget}] resolves to [${i.path}] which is not a typescript file inside the source edition`
+				)
+				// skip
+				continue
 			}
 
-			// map
-			imports[source] = [match, error || target]
+			// check of i.file.errors happens later
+
+			// success
 			continue
 		}
 
 		// check if remote depednency, if so, ignore
 		if (
-			source.startsWith('http:') ||
-			source.startsWith('https:') ||
-			source.startsWith('/')
+			sourceTarget.startsWith('http:') ||
+			sourceTarget.startsWith('https:') ||
+			sourceTarget.startsWith('/')
 		) {
-			log.log(`${path}: imports remote path [${source}]`)
-			imports[source] = [match, source]
+			i.type = 'remote'
+			i.resultTarget = sourceTarget
 			continue
 		}
 
-		// check if package path, or remote dependency
-		let dep: string = source,
-			entry = ''
-		if (source.includes('/')) {
-			const parts = source.split('/')
-			dep = parts.shift()!
-			if (dep[0] === '@') {
-				dep += '/' + parts.shift()
+		// anything left over must be a dependency
+		i.type = 'dep'
+
+		// extract manual entry from package
+		if (sourceTarget.includes('/')) {
+			// custom entry, extract parts
+			const parts = sourceTarget.split('/')
+			i.package = parts.shift()!
+			// if dep is a scoped package, then include the next part
+			if (i.package[0] === '@') {
+				i.package = '/' + parts.shift()
 			}
-			entry = parts.join('/')
-			log.log(
-				`${path}: imports suspected package [${dep}] with entry [${entry}]`
-			)
+			// remaining parts will be the manual entry
+			i.entry = parts.join('/')
 			// actually continue
+		} else {
+			// no custom entry
+			i.package = sourceTarget
 		}
 
 		// check if builtin
-		if (!entry && builtins.includes(dep)) {
-			// otherwise, probably node builtin, check for compat
-			if (compat.includes(dep)) {
-				target = `https://deno.land/std/node/${dep}.ts`
-				log.log(
-					`${path}: imports node builtin [${dep}] with compat at [${target}]`
-				)
-				imports[source] = [match, target]
+		if (!i.entry && builtins.includes(i.package)) {
+			i.type = 'builtin'
+
+			// check for compat
+			if (compat.includes(i.package)) {
+				i.resultTarget = `https://deno.land/std/node/${i.package}.ts`
 				continue
 			}
 
-			// fail as non-compat node builtin
-			error = new Error(
-				`${path}: imports node builtin [${dep}] which does not have a compat layer`
+			// fail as the builtin does not yet have a compatibility proxy
+			i.errors.add(
+				`import of [${i.sourceTarget}] is for a node.js builtin that does not yet have a deno compatibility layer`
 			)
-			log.warn(error)
-			imports[source] = [match, error]
-		} else {
+			continue
+		}
+		// not a builtin, is a dependency, check if installed
+		else {
 			// check if package, if so, check for deno entry, if so use that, otherwise use main
-			const version = deps[dep] ?? devDeps[dep]
-			if (version) {
-				try {
-					// consider fetching from unpkg rather than node_modules
-					const depPkgPath = join(nm, dep, 'package.json')
-					const depPkg = await readJSON(depPkgPath).catch((err) =>
-						Promise.reject(
-							new Errlop(
-								`${path}: imports a known but uninstalled dependency [${dep}]: install it to node_modules and try again`,
-								err
-							)
-						)
+			i.dep = details.deps[i.package]
+			if (i.dep) {
+				// apply
+				const entry = i.entry || i.dep.entry || ''
+				i.resultTarget = i.dep.url + '/' + entry
+
+				// check of i.dep.errors happens later
+
+				// fail if invalid entry
+				if (!entry.endsWith('.ts')) {
+					i.errors.add(
+						`import of [${i.sourceTarget}] resolved to an entry of [${entry}], which is not a typescript file`
 					)
-					const deno = depPkg?.deno
-					const main = depPkg?.main
-					const resolvedEntry = entry || deno || main
-					const target = `https://unpkg.com/${dep}@${version}/${resolvedEntry}`
-					log.log(`${path}: imports package [${target}]`)
-					if (!resolvedEntry.endsWith('.ts')) {
-						error = new Error(
-							`${path}: imported [${source}] which had an extension other than .ts`
-						)
-						log.warn(error)
-					}
-					imports[source] = [match, error || target]
 					continue
-				} catch (error) {
-					imports[source] = [match, error]
-					log.warn(error)
 				}
 			}
 
-			// uninstalled dependency
-			error = new Error(
-				`${path}: imports an unknown dependency [${dep}]: add it to package.json and try again`
+			// invalid dependnecy import
+			i.errors.add(
+				`import of [${i.sourceTarget}] appears to be a dependency that is uninstalled, install it and try again`
 			)
-			log.warn(error)
-			imports[source] = [match, error]
 		}
 	}
 
-	// check for errors
-	let resultContent = sourceContent
-	let error: Error | null = null
-	for (const [source, [match, result]] of Object.entries(imports)) {
-		if (result instanceof Error) {
-			error = new Errlop(result, error)
-			continue
-		}
-	}
-
-	// write to cache
-	cache[path] = error || resultContent
-
-	// do the postponed items
-	await Promise.all(postponed.map((p) => p()))
-
-	// now that locals (and thus possibly circular are added)
-	// which makes our conversions complete, do a
+	// perform the replacements
+	let result = file.source
 	let offset = 0
-	error = null
-	for (const [source, [match, result]] of Object.entries(imports)) {
-		if (result instanceof Error) {
-			error = new Errlop(result, error)
-			continue
-		}
-		const target = result
-		const cursor = match.index! + offset
-		const source = match[0]
-		const replacement = source.replace(match[1], target)
-		resultContent =
-			resultContent.substring(0, cursor) +
+	for (const i of file.imports) {
+		if (!i.resultTarget) continue
+		const cursor = i.sourceIndex + offset
+		const replacement = i.sourceStatement.replace(
+			i.sourceTarget,
+			i.resultTarget
+		)
+		result =
+			result.substring(0, cursor) +
 			replacement +
-			resultContent.substring(cursor + source.length)
-		offset += replacement.length - source.length
+			result.substring(cursor + i.sourceStatement.length)
+		offset += replacement.length - i.sourceStatement.length
 	}
-
-	// write to cache
-	cache[path] = error || resultContent
+	file.result = result
 
 	// return
-	if (error) {
-		log.warn(`${path}: has incompatibilities:\n`, error.stack)
-		return error
-	} else {
-		log.success(`${path}: converted to deno successfully`)
-		return resultContent
-	}
+	return file
 }
 
 export interface MakeOpts {
@@ -342,7 +331,7 @@ export async function make({
 	failOnEntryIncompatibility = true,
 	failOnTestIncompatibility = false,
 	failOnOtherIncompatibility = false,
-}: MakeOpts = {}) {
+}: MakeOpts = {}): Promise<Details> {
 	// paths
 	const pkgPath = join(cwd, 'package.json')
 	const pkg = await readJSON(pkgPath).catch((err) =>
@@ -353,8 +342,6 @@ export async function make({
 	const denoEditionDirectory = 'edition-deno'
 	const denoEditionPath = join(cwd, denoEditionDirectory)
 	const nm = join(cwd, 'node_modules')
-	const deps: Dependencies = pkg.dependencies || {}
-	const devDeps: Dependencies = pkg.devDependencies || {}
 
 	// check editions
 	const sourceEdition = pkg?.editions && pkg.editions[0]
@@ -364,7 +351,8 @@ export async function make({
 		!sourceEdition.tags?.includes('import')
 	) {
 		throw new Error(
-			'package.json require typescript source edition that uses ESM, refer to https://editions.bevry.me'
+			'make-deno-edition requires you to define the edition entry for the typescript source code\n' +
+				'refer to https://github.com/bevry/make-deno-edition and https://editions.bevry.me for details'
 		)
 	}
 
@@ -379,89 +367,192 @@ export async function make({
 	// delete the old files
 	await rimrafp(denoEditionPath)
 
+	// prepare details
+	const details: Details = {
+		files: {},
+		deps: {},
+		errors: new Set<string>(),
+		warnings: new Set<string>(),
+	}
+
+	// add the dependencies
+	for (const [name, version] of Object.entries(
+		Object.assign(pkg.dependencies || {}, pkg.devDependencies || {})
+	)) {
+		if (details.deps[name]) {
+			throw new Error(`[${name}] dependency is duplicated`)
+		} else {
+			const dep: Dependency = {
+				name,
+				version: version as string,
+				url: `https://unpkg.com/${name}@${version}`,
+				errors: new Set<string>(),
+			}
+
+			const path = join(nm, name, 'package.json')
+			try {
+				const pkg = await readJSON(path)
+				const deno = pkg?.deno
+				const main = pkg?.main
+				dep.entry = deno || main
+			} catch (err) {
+				// don't change success, as this dependnecy may not be actually be used
+				dep.errors.add(
+					`dependency [${name}] does not appear installed, as [${path}] was not valid JSON, install the dependency and try again`
+				)
+			}
+
+			details.deps[dep.name] = dep
+		}
+	}
+
+	// add the files
+	await Promise.all(
+		paths.map(async (path) => {
+			const filename = path.replace(sourceEditionPath + '/', '')
+			const source = await readFile(path, 'utf-8')
+			const file: File = {
+				path,
+				filename,
+				denoPath: join(denoEditionPath, filename),
+				source,
+				imports: [],
+				errors: new Set<string>(),
+			}
+			details.files[path] = file
+		})
+	)
+
 	// convert all the files
-	let fail: Error | undefined
-	const files: Files = {}
+	for (const path of Object.keys(details.files)) {
+		convert(path, details)
+	}
+
+	// bubble nested errors
+	for (const iteration of [1, 2]) {
+		for (const [path, file] of Object.entries(details.files)) {
+			for (const i of file.imports) {
+				// bubble dep import errors
+				if (i.dep?.errors.size) {
+					for (const e of i.dep.errors) {
+						i.errors.add(
+							`import of dependency [${i.sourceTarget}] has incompatibility: ${e}`
+						)
+					}
+				}
+
+				// bubble file import errors
+				if (i.file?.errors.size) {
+					for (const e of i.file.errors) {
+						i.errors.add(
+							`import of file [${i.sourceTarget}] has incompatibility: ${e}`
+						)
+					}
+				}
+				// bubble import errors
+				if (i.errors.size) {
+					for (const e of i.errors) {
+						file.errors.add(`file [${file.path}] has incompatibility: ${e}`)
+					}
+				}
+			}
+		}
+	}
+
+	// check if we care about the errors or not
 	for (const path of paths) {
-		const filename = path.replace(sourceEditionPath + '/', '')
-		const result = await convert({ path, cache: files, nm, deps, devDeps })
-		if (result instanceof Error) {
-			if (filename === sourceEdition.entry) {
+		const file = convert(path, details)
+		if (file.errors.size) {
+			if (file.filename === sourceEdition.entry) {
 				// entry
 				if (failOnEntryIncompatibility) {
-					const error = new Errlop(
-						`${path}: has entry incompatibilities`,
-						result
-					)
-					log.error(error)
-					fail = new Errlop(error, fail)
+					for (const e of file.errors) {
+						details.errors.add(
+							`entry file [${file.path}] has incompatibility: ${e}`
+						)
+					}
 				} else {
-					const error = new Errlop(
-						`${path}: has entry incompatibilities, which we have configured to ignore`,
-						result
-					)
-					log.special(error)
+					for (const e of file.errors) {
+						details.errors.add(
+							`optional entry file [${file.path}] has incompatibility: ${e}`
+						)
+					}
 				}
-			} else if (filename.includes('test')) {
+			} else if (file.filename.includes('test')) {
 				// test
 				if (failOnTestIncompatibility) {
-					const error = new Errlop(
-						`${path}: has test incompatibilities`,
-						result
-					)
-					log.error(error)
-					fail = new Errlop(error, fail)
+					for (const e of file.errors) {
+						details.errors.add(
+							`test file [${file.path}] has incompatibility: ${e}`
+						)
+					}
 				} else {
-					const error = new Errlop(
-						`${path}: has test incompatibilities, which we have configured to ignore`,
-						result
-					)
-					log.special(error)
+					for (const e of file.errors) {
+						details.errors.add(
+							`optional test file [${file.path}] has incompatibility: ${e}`
+						)
+					}
 				}
 			} else {
 				// other
 				// eslint-disable-next-line no-lonely-if
 				if (failOnOtherIncompatibility) {
-					const error = new Errlop(
-						`${path}: has other incompatibilities`,
-						result
-					)
-					log.error(error)
-					fail = new Errlop(error, fail)
+					for (const e of file.errors) {
+						details.errors.add(
+							`utility file [${file.path}] has incompatibility: ${e}`
+						)
+					}
 				} else {
-					const error = new Errlop(
-						`${path}: has other incompatibilities, which we have configured to ignore`,
-						result
-					)
-					log.special(error)
+					for (const e of file.errors) {
+						details.errors.add(
+							`optional utility file [${file.path}] has incompatibility: ${e}`
+						)
+					}
 				}
 			}
-		} else {
-			// write the new files
-			const denoPath = join(denoEditionPath, filename)
-			log.status(`writing [${denoPath}]...`)
-			await ensureFile(denoPath, result)
-			log.status(`...wrote [${denoPath}]`)
 		}
 	}
 
-	// delete deno edition, will be re-added later if it is suitable
+	// if successful, write the new files
+	if (details.errors.size === 0) {
+		for (const file of Object.values(details.files)) {
+			// write the successful files only
+			if (file.errors.size === 0) {
+				if (file.result == null)
+					throw new Error('the file had no errors, yet had no content')
+				await ensureFile(file.denoPath, file.result)
+			}
+		}
+	}
+
+	// delete deno edition entry, will be re-added later if it is suitable
 	pkg.editions = pkg.editions.filter(
 		(e: any) => e.directory !== denoEditionDirectory
 	)
 
-	// failure
-	if (fail) {
+	// change package.json for failure
+	if (details.errors.size) {
+		// delete deno keywords
+		const keywords = new Set<string>(pkg.keywords || [])
+		keywords.delete('deno')
+		keywords.delete('denoland')
+		keywords.delete('deno-edition')
+		pkg.keywords = Array.from(keywords).sort()
+
 		// delete deno entry
 		delete pkg.deno
 
 		// save
 		writeJSON(pkgPath, pkg)
-
-		// return
-		return Promise.reject(fail)
-	} else {
-		// success
+	}
+	// change package.json for success
+	else {
+		// add deno keywords
+		const keywords = new Set<string>(pkg.keywords || [])
+		keywords.add('deno')
+		keywords.add('denoland')
+		keywords.add('deno-edition')
+		pkg.keywords = Array.from(keywords).sort()
 
 		// add deno edition
 		const denoEdition = {
@@ -481,8 +572,8 @@ export async function make({
 
 		// save
 		writeJSON(pkgPath, pkg)
-
-		// return
-		return true
 	}
+
+	// return details
+	return details
 }

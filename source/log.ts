@@ -1,11 +1,14 @@
 import chalk from 'chalk'
+import { inspect as utilInspect } from 'util'
 
-export function log(...m: any) {
-	console.log(...m)
+export function inspect(a: any): any {
+	if (typeof a === 'string') return a
+	else if (a instanceof Set) return Array.from(a).map((i) => inspect(i))
+	else return utilInspect(a, { colors: true, depth: 5 })
 }
 
-export function status(...m: any) {
-	process.stdout.write(chalk.bold.underline(...m) + '\n')
+export function details(...m: any) {
+	console.log(...m.map((m: any) => inspect(m)))
 }
 
 export function special(...m: any) {
@@ -24,7 +27,6 @@ export function success(...m: any) {
 	process.stderr.write(chalk.bold.underline.green(...m) + '\n')
 }
 
-export function fatal(...m: any) {
-	error(...m)
-	process.exit(1)
+export function log(...m: any) {
+	console.log(...m)
 }
