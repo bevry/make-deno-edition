@@ -7,6 +7,8 @@ import mkdirp from 'mkdirp'
 import { resolve, join, extname, dirname } from 'path'
 import { promises as fsPromises, exists as fsExists } from 'fs'
 
+import spawn from 'await-spawn'
+
 import * as color from './color.js'
 
 async function rimrafp(p: string) {
@@ -470,6 +472,7 @@ export async function make({
 	}
 
 	// if successful, write the new files
+	const denoFiles: File[] = []
 	if (details.success) {
 		for (const file of Object.values(details.files)) {
 			// write the successful files only
@@ -477,7 +480,21 @@ export async function make({
 				if (file.result == null)
 					throw new Error('the file had no errors, yet had no content')
 				await ensureFile(file.denoPath, file.result)
+				denoFiles.push(file)
 			}
+		}
+	}
+
+	// attempt to run the successful files
+	for (const file of denoFiles) {
+		try {
+			await spawn('deno', ['run', file.denoPath])
+		} catch (err) {
+			file.errors.add(
+				'running deno on the file failed:\n' +
+					String(err.stderr).replace(/\n/g, '\n\t')
+			)
+			details.success = false
 		}
 	}
 

@@ -1,6 +1,6 @@
 {
   "name": "make-deno-edition",
-  "version": "0.5.1",
+  "version": "0.6.0",
   "description": "Make a deno edition of a npm package",
   "homepage": "https://github.com/bevry/make-deno-edition",
   "license": "MIT",
@@ -100,6 +100,7 @@
   "main": "edition-esnext/index.js",
   "dependencies": {
     "@types/rimraf": "^3.0.0",
+    "await-spawn": "^3.0.0",
     "chalk": "^4.1.0",
     "errlop": "^3.6.0",
     "fdir": "^3.4.3",

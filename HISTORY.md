@@ -1,5 +1,9 @@
 # History
 
+## v0.6.0 2020 June 20
+
+-   Now each made deno edition file is run against deno
+
 ## v0.5.1 2020 June 20
 
 -   Fixed imports of the name as the package being mangled (regression since v0.4.0)
