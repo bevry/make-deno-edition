@@ -501,6 +501,7 @@ export async function make({
 		const keywords = new Set<string>(pkg.keywords || [])
 		keywords.add('deno')
 		keywords.add('denoland')
+		keywords.add('deno-entry')
 		keywords.add('deno-edition')
 		pkg.keywords = Array.from(keywords).sort()
 
@@ -529,6 +530,7 @@ export async function make({
 		const keywords = new Set<string>(pkg.keywords || [])
 		keywords.delete('deno')
 		keywords.delete('denoland')
+		keywords.delete('deno-entry')
 		keywords.delete('deno-edition')
 		pkg.keywords = Array.from(keywords).sort()
 

@@ -1,5 +1,11 @@
 # History
 
+## v0.4.0 2020 June 20
+
+-   Add or remove the `package.json` keywords `deno`, `denoland`, `deno-entry`, and `deno-edition` based on successful deno compatibility
+-   Cleaner and more detailed and useful output
+-   Updated dependencies, [base files](https://github.com/bevry/base), and [editions](https://editions.bevry.me) using [boundation](https://github.com/bevry/boundation)
+
 ## v0.3.0 2020 June 11
 
 -   Updated dependencies, [base files](https://github.com/bevry/base), and [editions](https://editions.bevry.me) using [boundation](https://github.com/bevry/boundation)
