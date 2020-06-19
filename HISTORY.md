@@ -1,5 +1,13 @@
 # History
 
+## v0.5.1 2020 June 20
+
+-   Fixed imports of the name as the package being mangled (regression since v0.4.0)
+
+## v0.5.0 2020 June 20
+
+-   Support `buffer` imports
+
 ## v0.4.2 2020 June 20
 
 -   Fix non-functional typo

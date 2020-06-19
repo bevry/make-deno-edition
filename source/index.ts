@@ -1,4 +1,4 @@
-/* eslint new-cap:0, no-loop-func:0 */
+/* eslint new-cap:0, no-loop-func:0, camelcase:0  */
 import fdir from 'fdir'
 import Errlop from 'errlop'
 import rimraf from 'rimraf'
@@ -37,53 +37,42 @@ async function ensureFile(p: string, data: string) {
 }
 
 // https://deno.land/std/node
-const builtins = [
-	'assert',
-	'buffer',
-	'child_process',
-	'cluster',
-	'console',
-	'crypto',
-	'dgram',
-	'dns',
-	'events',
-	'fs',
-	'http',
-	'http2',
-	'https',
-	'module',
-	'net',
-	'os',
-	'path',
-	'perf_hooks',
-	'process',
-	'querystring',
-	'readline',
-	'repl',
-	'stream',
-	'string_decoder',
-	'sys',
-	'timers',
-	'tls',
-	'tty',
-	'url',
-	'util',
-	'v8',
-	'vm',
-	'worker_threads',
-	'zlib',
-]
-const compat = [
-	'events',
-	'fs',
-	'module',
-	'os',
-	'path',
-	'process',
-	'querystring',
-	'timers',
-	'util',
-]
+const builtins: { [key: string]: boolean } = {
+	assert: false,
+	buffer: true,
+	child_process: false,
+	cluster: false,
+	console: false,
+	crypto: false,
+	dgram: false,
+	dns: false,
+	events: true,
+	fs: true,
+	http: false,
+	http2: false,
+	https: false,
+	module: true,
+	net: false,
+	os: true,
+	path: true,
+	perf_hooks: false,
+	process: true,
+	querystring: true,
+	readline: false,
+	repl: false,
+	stream: false,
+	string_decoder: false,
+	sys: false,
+	timers: true,
+	tls: false,
+	tty: false,
+	url: false,
+	util: true,
+	v8: false,
+	vm: false,
+	worker_threads: false,
+	zlib: false,
+}
 
 export interface CompatibilityStatus {
 	success: true
@@ -249,11 +238,12 @@ export function convert(path: string, details: Details): File {
 		}
 
 		// check if builtin
-		if (!i.entry && builtins.includes(i.package)) {
+		const compat = builtins[i.package] ?? null
+		if (!i.entry && compat !== null) {
 			i.type = 'builtin'
 
 			// check for compat
-			if (compat.includes(i.package)) {
+			if (compat) {
 				i.resultTarget = `https://deno.land/std/node/${i.package}.ts`
 				continue
 			}
@@ -298,10 +288,11 @@ export function convert(path: string, details: Details): File {
 		i.label = `${i.type} import of [${i.sourceTarget}] => [${i.resultTarget}]`
 		if (!i.resultTarget) continue
 		const cursor = i.sourceIndex + offset
-		const replacement = i.sourceStatement.replace(
-			i.sourceTarget,
-			i.resultTarget
-		)
+		const parts = i.sourceStatement.split(' ')
+		const lastPart = parts.pop()
+		const replacement = parts
+			.concat([lastPart!.replace(i.sourceTarget, i.resultTarget)])
+			.join(' ')
 		result =
 			result.substring(0, cursor) +
 			replacement +
