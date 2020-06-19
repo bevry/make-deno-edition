@@ -7,7 +7,7 @@ import mkdirp from 'mkdirp'
 import { resolve, join, extname, dirname } from 'path'
 import { promises as fsPromises, exists as fsExists } from 'fs'
 
-import { inspect } from './log.js'
+import * as color from './color.js'
 
 async function rimrafp(p: string) {
 	return new Promise(function (resolve, reject) {
@@ -98,6 +98,7 @@ export interface Import {
 	 * - builtin imports are proxied to their deno compat layer if available
 	 */
 	type: null | 'internal' | 'remote' | 'dep' | 'builtin'
+	label: string
 	sourceIndex: number
 	sourceStatement: string
 	sourceTarget: string
@@ -114,12 +115,16 @@ export interface Import {
 export type Imports = Import[]
 
 export interface File {
+	/** what the file should be referred to as */
+	label: string
 	/** absolute filesystem path */
 	path: string
 	/** relative to the package directory */
 	filename: string
 	/** deno edition path */
 	denoPath: string
+	/** whether or not the file is necessary or not */
+	necessary: boolean
 	/** source file content */
 	source: string
 	/** result file content */
@@ -153,8 +158,7 @@ export interface Dependencies {
 export interface Details {
 	files: Files
 	deps: Dependencies
-	errors: Set<string>
-	warnings: Set<string>
+	success: boolean
 }
 
 export function convert(path: string, details: Details): File {
@@ -162,10 +166,11 @@ export function convert(path: string, details: Details): File {
 	const file = details.files[path]
 
 	// extract imports
-	const matches = file.source.matchAll(/ from ['"]([^'"]+)['"]/g)
+	const matches = file.source.matchAll(/^import .+? from ['"]([^'"]+)['"]$/gm)
 	for (const match of matches) {
 		const i: Import = {
 			type: null,
+			label: match[1],
 			sourceIndex: match.index!,
 			sourceStatement: match[0],
 			sourceTarget: match[1],
@@ -200,7 +205,7 @@ export function convert(path: string, details: Details): File {
 			i.file = details.files[i.path]
 			if (!i.file) {
 				i.errors.add(
-					`import of [${i.sourceTarget}] resolves to [${i.path}] which is not a typescript file inside the source edition`
+					`resolves to [${i.path}] which is not a typescript file inside the source edition`
 				)
 				// skip
 				continue
@@ -233,7 +238,7 @@ export function convert(path: string, details: Details): File {
 			i.package = parts.shift()!
 			// if dep is a scoped package, then include the next part
 			if (i.package[0] === '@') {
-				i.package = '/' + parts.shift()
+				i.package += '/' + parts.shift()
 			}
 			// remaining parts will be the manual entry
 			i.entry = parts.join('/')
@@ -255,7 +260,7 @@ export function convert(path: string, details: Details): File {
 
 			// fail as the builtin does not yet have a compatibility proxy
 			i.errors.add(
-				`import of [${i.sourceTarget}] is for a node.js builtin that does not yet have a deno compatibility layer`
+				`is a node.js builtin that does not yet have a deno compatibility layer`
 			)
 			continue
 		}
@@ -273,16 +278,16 @@ export function convert(path: string, details: Details): File {
 				// fail if invalid entry
 				if (!entry.endsWith('.ts')) {
 					i.errors.add(
-						`import of [${i.sourceTarget}] resolved to an entry of [${entry}], which is not a typescript file`
+						`resolved to [${i.package}/${entry}], which does not have the .ts extension`
 					)
 					continue
 				}
+			} else {
+				// invalid dependency import
+				i.errors.add(
+					`appears to be an uninstalled dependency, install it and try again`
+				)
 			}
-
-			// invalid dependnecy import
-			i.errors.add(
-				`import of [${i.sourceTarget}] appears to be a dependency that is uninstalled, install it and try again`
-			)
 		}
 	}
 
@@ -290,6 +295,7 @@ export function convert(path: string, details: Details): File {
 	let result = file.source
 	let offset = 0
 	for (const i of file.imports) {
+		i.label = `${i.type} import of [${i.sourceTarget}] => [${i.resultTarget}]`
 		if (!i.resultTarget) continue
 		const cursor = i.sourceIndex + offset
 		const replacement = i.sourceStatement.replace(
@@ -371,8 +377,7 @@ export async function make({
 	const details: Details = {
 		files: {},
 		deps: {},
-		errors: new Set<string>(),
-		warnings: new Set<string>(),
+		success: true,
 	}
 
 	// add the dependencies
@@ -411,10 +416,27 @@ export async function make({
 		paths.map(async (path) => {
 			const filename = path.replace(sourceEditionPath + '/', '')
 			const source = await readFile(path, 'utf-8')
+			let necessary: boolean
+			let label: string
+
+			if (filename === sourceEdition.entry) {
+				necessary = failOnEntryIncompatibility
+				label = `entry file [${path}]`
+			} else if (filename.includes('test')) {
+				necessary = failOnTestIncompatibility
+				label = `test file [${path}]`
+			} else {
+				necessary = failOnOtherIncompatibility
+				label = `utility file [${path}]`
+			}
+			label = (necessary ? 'necessary ' : 'optional ') + label
+
 			const file: File = {
+				label,
 				path,
 				filename,
 				denoPath: join(denoEditionPath, filename),
+				necessary,
 				source,
 				imports: [],
 				errors: new Set<string>(),
@@ -433,88 +455,31 @@ export async function make({
 		for (const [path, file] of Object.entries(details.files)) {
 			for (const i of file.imports) {
 				// bubble dep import errors
-				if (i.dep?.errors.size) {
-					for (const e of i.dep.errors) {
-						i.errors.add(
-							`import of dependency [${i.sourceTarget}] has incompatibility: ${e}`
-						)
-					}
-				}
-
+				if (i.dep?.errors.size)
+					i.errors.add(
+						`import of dependnecy [${i.dep.name}] has incompatibilities`
+					)
 				// bubble file import errors
-				if (i.file?.errors.size) {
-					for (const e of i.file.errors) {
-						i.errors.add(
-							`import of file [${i.sourceTarget}] has incompatibility: ${e}`
-						)
-					}
-				}
+				if (i.file?.errors.size)
+					i.errors.add(
+						`import of local file [${i.sourceTarget}] has incompatibilities`
+					)
 				// bubble import errors
-				if (i.errors.size) {
-					for (const e of i.errors) {
-						file.errors.add(`file [${file.path}] has incompatibility: ${e}`)
-					}
-				}
+				if (i.errors.size) file.errors.add(`has import incompatibilities`)
 			}
 		}
 	}
 
 	// check if we care about the errors or not
-	for (const path of paths) {
-		const file = convert(path, details)
-		if (file.errors.size) {
-			if (file.filename === sourceEdition.entry) {
-				// entry
-				if (failOnEntryIncompatibility) {
-					for (const e of file.errors) {
-						details.errors.add(
-							`entry file [${file.path}] has incompatibility: ${e}`
-						)
-					}
-				} else {
-					for (const e of file.errors) {
-						details.errors.add(
-							`optional entry file [${file.path}] has incompatibility: ${e}`
-						)
-					}
-				}
-			} else if (file.filename.includes('test')) {
-				// test
-				if (failOnTestIncompatibility) {
-					for (const e of file.errors) {
-						details.errors.add(
-							`test file [${file.path}] has incompatibility: ${e}`
-						)
-					}
-				} else {
-					for (const e of file.errors) {
-						details.errors.add(
-							`optional test file [${file.path}] has incompatibility: ${e}`
-						)
-					}
-				}
-			} else {
-				// other
-				// eslint-disable-next-line no-lonely-if
-				if (failOnOtherIncompatibility) {
-					for (const e of file.errors) {
-						details.errors.add(
-							`utility file [${file.path}] has incompatibility: ${e}`
-						)
-					}
-				} else {
-					for (const e of file.errors) {
-						details.errors.add(
-							`optional utility file [${file.path}] has incompatibility: ${e}`
-						)
-					}
-				}
-			}
+	for (const file of Object.values(details.files)) {
+		if (file.errors.size && file.necessary) {
+			details.success = false
+			break
 		}
 	}
 
 	// if successful, write the new files
-	if (details.errors.size === 0) {
+	if (details.success) {
 		for (const file of Object.values(details.files)) {
 			// write the successful files only
 			if (file.errors.size === 0) {
@@ -530,23 +495,8 @@ export async function make({
 		(e: any) => e.directory !== denoEditionDirectory
 	)
 
-	// change package.json for failure
-	if (details.errors.size) {
-		// delete deno keywords
-		const keywords = new Set<string>(pkg.keywords || [])
-		keywords.delete('deno')
-		keywords.delete('denoland')
-		keywords.delete('deno-edition')
-		pkg.keywords = Array.from(keywords).sort()
-
-		// delete deno entry
-		delete pkg.deno
-
-		// save
-		writeJSON(pkgPath, pkg)
-	}
 	// change package.json for success
-	else {
+	if (details.success) {
 		// add deno keywords
 		const keywords = new Set<string>(pkg.keywords || [])
 		keywords.add('deno')
@@ -573,7 +523,61 @@ export async function make({
 		// save
 		writeJSON(pkgPath, pkg)
 	}
+	// change package.json for failure
+	else {
+		// delete deno keywords
+		const keywords = new Set<string>(pkg.keywords || [])
+		keywords.delete('deno')
+		keywords.delete('denoland')
+		keywords.delete('deno-edition')
+		pkg.keywords = Array.from(keywords).sort()
+
+		// delete deno entry
+		delete pkg.deno
+
+		// save
+		writeJSON(pkgPath, pkg)
+	}
 
 	// return details
 	return details
+}
+
+export function inform(details: Details, verbose = false) {
+	console.log()
+	for (const path of Object.keys(details.files).sort()) {
+		const file = details.files[path]
+		if (file.errors.size) {
+			if (verbose) {
+				console.log()
+			}
+			if (file.necessary) {
+				console.log(color.error(file.label, 'failed'))
+			} else {
+				console.log(color.warn(file.label, 'skipped'))
+			}
+			if (verbose) {
+				for (const e of file.errors) {
+					console.log('↳ ', e)
+					for (const i of file.imports) {
+						if (i.errors.size) {
+							console.log('  ↳ ', i.label)
+							for (const e of i.errors) {
+								console.log('    ↳ ', e)
+							}
+						}
+					}
+				}
+			}
+		} else {
+			console.log(file.label, 'written')
+		}
+	}
+	// console.log('\ndetected dependencies:')
+	// for (const key of Object.keys(details.deps).sort()) {
+	// 	const dep = details.deps[key]
+	// 	console.log(color.inspect(dep))
+	// }
+	// add dep failures?
+	console.log()
 }
