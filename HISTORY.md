@@ -1,5 +1,12 @@
 # History
 
+## v0.7.0 2020 June 20
+
+-   Allow required deno permissions to be specified via `package.json` keywords
+-   Deno run commands are now outputted, and indentation is corrected
+-   Changed `written` to `passed` to reflect v0.6.0 changes
+-   If there is a `deno.ts` file inside the source edition, that is used as the deno entry instead
+
 ## v0.6.1 2020 June 20
 
 -   Fix non-functional typo

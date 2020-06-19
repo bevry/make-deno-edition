@@ -38,6 +38,17 @@ async function ensureFile(p: string, data: string) {
 	return await writeFile(p, data)
 }
 
+const perms: string[] = [
+	'all',
+	'env',
+	'hrtime',
+	'net',
+	'plugin',
+	'read',
+	'run',
+	'write',
+]
+
 // https://deno.land/std/node
 const builtins: { [key: string]: boolean } = {
 	assert: false,
@@ -338,9 +349,20 @@ export async function make({
 	)
 
 	// prepare
+	const keywords = new Set<string>(pkg.keywords || [])
 	const denoEditionDirectory = 'edition-deno'
 	const denoEditionPath = join(cwd, denoEditionDirectory)
 	const nm = join(cwd, 'node_modules')
+
+	// permission args
+	const permArgs: string[] = []
+	for (const perm of perms) {
+		const name = 'allow-' + perm
+		if (keywords.has(name)) {
+			const arg = '--' + name
+			permArgs.push(arg)
+		}
+	}
 
 	// check editions
 	const sourceEdition = pkg?.editions && pkg.editions[0]
@@ -355,8 +377,15 @@ export async function make({
 		)
 	}
 
-	// get the ts files of the source directory
-	const sourceEditionPath = join(cwd, pkg.editions[0].directory)
+	// get the source edition path
+	const sourceEditionPath = join(cwd, sourceEdition.directory)
+
+	// get the deno entry
+	const denoEntry = (await exists(join(sourceEditionPath, 'deno.ts')))
+		? 'deno.ts'
+		: sourceEdition.entry
+
+	// get the source edition files
 	const api = new fdir()
 		.withFullPaths()
 		.filter((path) => path.endsWith('.ts'))
@@ -412,7 +441,7 @@ export async function make({
 			let necessary: boolean
 			let label: string
 
-			if (filename === sourceEdition.entry) {
+			if (filename === denoEntry) {
 				necessary = failOnEntryIncompatibility
 				label = `entry file [${path}]`
 			} else if (filename.includes('test')) {
@@ -487,14 +516,17 @@ export async function make({
 
 	// attempt to run the successful files
 	for (const file of denoFiles) {
+		const args = ['run', ...permArgs, file.denoPath]
 		try {
-			await spawn('deno', ['run', file.denoPath])
+			await spawn('deno', args)
 		} catch (err) {
 			file.errors.add(
-				'running deno on the file failed:\n' +
+				`running deno on the file failed:\n\tdeno ${args.join(' ')}\n\t` +
 					String(err.stderr).replace(/\n/g, '\n\t')
 			)
-			details.success = false
+			if (file.errors.size && file.necessary) {
+				details.success = false
+			}
 		}
 	}
 
@@ -506,7 +538,6 @@ export async function make({
 	// change package.json for success
 	if (details.success) {
 		// add deno keywords
-		const keywords = new Set<string>(pkg.keywords || [])
 		keywords.add('deno')
 		keywords.add('denoland')
 		keywords.add('deno-entry')
@@ -517,7 +548,7 @@ export async function make({
 		const denoEdition = {
 			description: 'TypeScript source code made to be compatible with Deno',
 			directory: denoEditionDirectory,
-			entry: sourceEdition.entry,
+			entry: denoEntry,
 			tags: ['typescript', 'import', 'deno'],
 			engines: {
 				deno: true,
@@ -535,7 +566,6 @@ export async function make({
 	// change package.json for failure
 	else {
 		// delete deno keywords
-		const keywords = new Set<string>(pkg.keywords || [])
 		keywords.delete('deno')
 		keywords.delete('denoland')
 		keywords.delete('deno-entry')
@@ -580,7 +610,7 @@ export function inform(details: Details, verbose = false) {
 				}
 			}
 		} else {
-			console.log(file.label, 'written')
+			console.log(color.success(file.label, 'passed'))
 		}
 	}
 	// console.log('\ndetected dependencies:')
