@@ -1,5 +1,9 @@
 # History
 
+## v0.6.1 2020 June 20
+
+-   Fix non-functional typo
+
 ## v0.6.0 2020 June 20
 
 -   Now each made deno edition file is run against deno

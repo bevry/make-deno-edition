@@ -18,7 +18,7 @@ async function bin() {
 			console.log(color.special('make-deno-edition: OK!'))
 			console.log(
 				'The optional deno edition could not be created.\n' +
-					'For details, run make-deno-edition without the --atempt flag.'
+					'For details, run make-deno-edition without the --attempt flag.'
 			)
 		} else {
 			console.log(
