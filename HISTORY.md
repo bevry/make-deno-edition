@@ -1,5 +1,9 @@
 # History
 
+## v0.8.0 2020 June 20
+
+-   Trim various fetch polyfills
+
 ## v0.7.0 2020 June 20
 
 -   Allow required deno permissions to be specified via `package.json` keywords

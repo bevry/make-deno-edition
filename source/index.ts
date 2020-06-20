@@ -38,6 +38,16 @@ async function ensureFile(p: string, data: string) {
 	return await writeFile(p, data)
 }
 
+const trim: string[] = [
+	'cross-fetch',
+	'fetch-client',
+	'fetch-h2',
+	'fetch-lite',
+	'isomorphic-unfetch',
+	'node-fetch',
+	'unfetch',
+]
+
 const perms: string[] = [
 	'all',
 	'env',
@@ -163,6 +173,20 @@ export interface Details {
 	success: boolean
 }
 
+function replaceImportStatement(
+	sourceStatement: string,
+	sourceTarget: string,
+	resultTarget: string
+) {
+	if (!resultTarget) return ''
+	const parts = sourceStatement.split(' ')
+	const lastPart = parts.pop()
+	const replacement = parts
+		.concat([lastPart!.replace(sourceTarget, resultTarget)])
+		.join(' ')
+	return replacement
+}
+
 export function convert(path: string, details: Details): File {
 	// prepare
 	const file = details.files[path]
@@ -250,6 +274,12 @@ export function convert(path: string, details: Details): File {
 			i.package = sourceTarget
 		}
 
+		// check if unnecessary
+		if (!i.entry && trim.includes(i.package)) {
+			i.resultTarget = ''
+			continue
+		}
+
 		// check if builtin
 		const compat = builtins[i.package] ?? null
 		if (!i.entry && compat !== null) {
@@ -299,13 +329,16 @@ export function convert(path: string, details: Details): File {
 	let offset = 0
 	for (const i of file.imports) {
 		i.label = `${i.type} import of [${i.sourceTarget}] => [${i.resultTarget}]`
-		if (!i.resultTarget) continue
+		if (i.resultTarget == null) {
+			// error case
+			continue
+		}
 		const cursor = i.sourceIndex + offset
-		const parts = i.sourceStatement.split(' ')
-		const lastPart = parts.pop()
-		const replacement = parts
-			.concat([lastPart!.replace(i.sourceTarget, i.resultTarget)])
-			.join(' ')
+		const replacement = replaceImportStatement(
+			i.sourceStatement,
+			i.sourceTarget,
+			i.resultTarget
+		)
 		result =
 			result.substring(0, cursor) +
 			replacement +
