@@ -1,5 +1,9 @@
 # History
 
+## v0.9.0 2020 June 20
+
+-   Updated dependencies, [base files](https://github.com/bevry/base), and [editions](https://editions.bevry.me) using [boundation](https://github.com/bevry/boundation)
+
 ## v0.8.1 2020 June 20
 
 -   Support `export * from 'module'` statements
