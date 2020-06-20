@@ -41,31 +41,33 @@ Make a deno edition of a npm package
 
 Here is a list of Bevry packages that have used `make-deno-edition` to make themselves compatible with deno:
 
--   https://github.com/bevry/ambi
--   https://github.com/bevry/arrangekeys
--   https://github.com/bevry/badges
--   https://github.com/bevry/binaryextensions
--   https://github.com/bevry/cachely
--   https://github.com/bevry/detect-indentation
--   https://github.com/bevry/envfile
--   https://github.com/bevry/errlop
--   https://github.com/bevry/fellow
--   https://github.com/bevry/get-cli-arg
--   https://github.com/bevry/ignorefs
--   https://github.com/bevry/ignorepatterns
--   https://github.com/bevry/istextorbinary
--   https://github.com/bevry/links
--   https://github.com/bevry/memo
--   https://github.com/bevry/native-promise-pool
--   https://github.com/bevry/normalify
--   https://github.com/bevry/oneday
--   https://github.com/bevry/remove-indentation
--   https://github.com/bevry/sortobject
--   https://github.com/bevry/start-of-week
--   https://github.com/bevry/textextensions
--   https://github.com/bevry/trim-indentation
--   https://github.com/bevry/typechecker
--   https://github.com/bevry/valid-module
+1.  https://github.com/bevry/ambi
+1.  https://github.com/bevry/arrangekeys
+1.  https://github.com/bevry/badges
+1.  https://github.com/bevry/binaryextensions
+1.  https://github.com/bevry/cachely
+1.  https://github.com/bevry/detect-indentation
+1.  https://github.com/bevry/envfile
+1.  https://github.com/bevry/errlop
+1.  https://github.com/bevry/fellow
+1.  https://github.com/bevry/get-cli-arg
+1.  https://github.com/bevry/getsetdeep
+1.  https://github.com/bevry/ignorefs
+1.  https://github.com/bevry/ignorepatterns
+1.  https://github.com/bevry/istextorbinary
+1.  https://github.com/bevry/links
+1.  https://github.com/bevry/memo
+1.  https://github.com/bevry/native-promise-pool
+1.  https://github.com/bevry/normalify
+1.  https://github.com/bevry/oneday
+1.  https://github.com/bevry/remove-indentation
+1.  https://github.com/bevry/ropo
+1.  https://github.com/bevry/sortobject
+1.  https://github.com/bevry/start-of-week
+1.  https://github.com/bevry/textextensions
+1.  https://github.com/bevry/trim-indentation
+1.  https://github.com/bevry/typechecker
+1.  https://github.com/bevry/valid-module
 
 ### Prerequisites
 
