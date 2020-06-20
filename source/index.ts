@@ -440,7 +440,7 @@ export async function make({
 
 	// add the dependencies
 	for (const [name, version] of Object.entries(
-		Object.assign(pkg.dependencies || {}, pkg.devDependencies || {})
+		Object.assign({}, pkg.dependencies || {}, pkg.devDependencies || {})
 	)) {
 		if (details.deps[name]) {
 			throw new Error(`[${name}] dependency is duplicated`)
