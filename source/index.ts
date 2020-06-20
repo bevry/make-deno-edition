@@ -192,7 +192,9 @@ export function convert(path: string, details: Details): File {
 	const file = details.files[path]
 
 	// extract imports
-	const matches = file.source.matchAll(/^import .+? from ['"]([^'"]+)['"]$/gm)
+	const matches = file.source.matchAll(
+		/^(?:import|export) .+? from ['"]([^'"]+)['"]$/gm
+	)
 	for (const match of matches) {
 		const i: Import = {
 			type: null,

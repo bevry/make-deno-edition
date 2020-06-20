@@ -1,5 +1,9 @@
 # History
 
+## v0.8.1 2020 June 20
+
+-   Support `export * from 'module'` statements
+
 ## v0.8.0 2020 June 20
 
 -   Trim various fetch polyfills
