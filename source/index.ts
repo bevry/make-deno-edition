@@ -43,6 +43,7 @@ const trim: string[] = [
 	'fetch-client',
 	'fetch-h2',
 	'fetch-lite',
+	'isomorphic-fetch',
 	'isomorphic-unfetch',
 	'node-fetch',
 	'unfetch',
