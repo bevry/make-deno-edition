@@ -6,7 +6,7 @@ node_js:
 matrix:
   fast_finish: true
   allow_failures: []
-cache: npm
+cache: yarn
 install:
   - >-
     eval "$(curl -fsSL
@@ -25,4 +25,4 @@ after_success:
 notifications:
   email:
     recipients: >-
-      ha/xzo2MtWJ+m1ZgzQBa2Qph2gNrhRy0dTEsyUtnRn/6OjXcKFaY+hNlVFLC3vHFAHOBaMr6idiD6KQubL4s58FXqpARROUdzfs9S11wDwJqWkvfMhjn+wliJ3bSQ8Aa+GtnS/pSykWLm1zEp2LT1BFmaPcarMKaD1D9QgZ+2Us3uXeJY0Ldi/Qq+hh6XeE6uIsO6u+ZWwVy30uT0tunSMblVTGKxCCIQX8WXWpWzH7z5fPdWnwkB8Lr/hAPHDiAtq6U2EyjSlnSMe7Zn9LkYjlWfiIe7jHIGEKWq8CFaL1nCrIWSZ9+sCer7P1dAtWeZRd9q/Qln5HDuA4efyqpxhHJmnkLxKdpcI6JwS2Cdva6UoVQQLBBkfpfzZcDocY52WbyCwQ9mTwpgcKMr/8qCYz5HStNodHPLetouhjlhf4n7GeD4WI+8q78i5FSqgGLGq79LA/DtD5np+Y4hu8tQCsqd3AAW3Y5zs0sJ2gsqsvrS0LONO1YEIoj1Lpb0WH7m+GHsdRmob+QgmrYf8kXgFMZJyul40+hxU7zUfInkT+Ao7jbrXbuVfEF30s34dvjHBZPg7uHXhCVwG1sKXDfgxSIrkEMvJG/zcwojN5HN5gSPphDgY+du3YutgZDm487nPgXoZf06F2dn0W+Mkv1RZEcYs31qYnxv4Ctbk/whkU=
+      WLTcNfV+rV21jx5/jj2CyIpPEesCOOk3f2feysPi//8IiwM5gXA8Ut6rByYuKxEx/HA12JmLlXK1kCGK+Kp7GijAtSkCbRPzdppIBpBgvbn9NBlukGwixL/LHWTC3SY2OfvtUiC3YrxEkwQ1wR5Ro+W3dDsohAbLdDLJ1y2SOFKbKpzSlGZB+b4I1/zFFzAalSvnKdL9+SJveKxkttGi4zO8I9hpg7eEdKYbZ5sEkxIY5IIPPsHnrnEiJ/9kPY/OM94B/esiQxa7oIqxnfuVyCGucfEQ+tnA+cQ9MNGvaQqPQln2VIOkDB0Ld7e/65crzdeOBRZWlxOhWf3wEN26tMAqvKQ4/G8O9VWuXE+0aId7kdrZbDu8b0qD9v06dmmHytSn9RNhFqZX65AcqBdMf18j8TDotv2NajSMHCJShkjWhkDArw6xCo4DEAe82Inl8a7eekAqLrHqWpX03r+WmQ0Ryh8JNMtk+qxqcDagMFf4EQqnTkqyD3HF/4Ng/4Qp1TodcGK4NsvLkiQcDr2TFKuXsgbt7C5HhKtnPsFR6I+0zkTkmIMidG6o3zg70ZYb/HlovPNR7NLCqJILMQRCBqqLlyRDQJyk7q1Qx/1FRN6YY6HX4IHziNMP693TuuSjw58K1pnkKv0Z7E5RRdg3G6OGBXFN+uSm7H76YYicWgg=
