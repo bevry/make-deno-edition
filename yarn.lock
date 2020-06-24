@@ -592,25 +592,20 @@ enquirer@^2.3.5:
   dependencies:
     ansi-colors "^3.2.1"
 
-errlop@3.4.0:
-  version "3.4.0"
-  resolved "https://registry.yarnpkg.com/errlop/-/errlop-3.4.0.tgz#be8567ca47b64e3f23f8fea00cc236b2575304d2"
-  integrity sha512-B23IeM1hj/9Rbz5lXgz6seSkxabgY+l1Yhq1PAV5EepRiTtk/otYdDJvBhlvrcl8wI+bl+wEaIoq7NmGKm8gcg==
-
 errlop@3.5.0:
   version "3.5.0"
   resolved "https://registry.yarnpkg.com/errlop/-/errlop-3.5.0.tgz#4d434606fd219f294d5ea489e71d0434191aebf4"
   integrity sha512-EU8r0FtFCGd1GPQTY7cxbmvNA5YEAIZJBewJTfB1dcRBsaEpXJJrF33kj8Y3fkAaidA8WnMrgtuSXXcULGA5zA==
 
+errlop@3.9.0, errlop@^3.5.0:
+  version "3.9.0"
+  resolved "https://registry.yarnpkg.com/errlop/-/errlop-3.9.0.tgz#a4981bd694496d42d667d317b9d4a9e9d232023c"
+  integrity sha512-LD7/NqU7OssMW9YOqyel1vW/L47GMV4O8YilSQHl86e8CsxSjOmxnaKayBPAcEBxTQ70hAeB5gA82nSgY1Bb9w==
+
 errlop@^2.0.0:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/errlop/-/errlop-2.2.0.tgz#1ff383f8f917ae328bebb802d6ca69666a42d21b"
   integrity sha512-e64Qj9+4aZzjzzFpZC7p5kmm/ccCrbLhAJplhsDXQFs87XTsXwOpH4s1Io2s90Tau/8r2j9f4l/thhDevRjzxw==
-
-errlop@^3.5.0:
-  version "3.9.0"
-  resolved "https://registry.yarnpkg.com/errlop/-/errlop-3.9.0.tgz#a4981bd694496d42d667d317b9d4a9e9d232023c"
-  integrity sha512-LD7/NqU7OssMW9YOqyel1vW/L47GMV4O8YilSQHl86e8CsxSjOmxnaKayBPAcEBxTQ70hAeB5gA82nSgY1Bb9w==
 
 es-abstract@^1.17.0-next.1, es-abstract@^1.17.4, es-abstract@^1.17.5:
   version "1.17.6"
