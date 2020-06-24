@@ -1,5 +1,9 @@
 # History
 
+## v0.11.1 2020 June 25
+
+-   Make binary have executable permissions which is reuqired for yarn environments
+
 ## v0.11.0 2020 June 25
 
 -   Updated dependencies, [base files](https://github.com/bevry/base), and [editions](https://editions.bevry.me) using [boundation](https://github.com/bevry/boundation)
