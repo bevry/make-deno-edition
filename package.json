@@ -102,9 +102,9 @@
     "@types/rimraf": "^3.0.0",
     "await-spawn": "^3.0.0",
     "chalk": "^4.1.0",
-    "errlop": "3.4.0",
+    "errlop": "3.9.0",
     "fdir": "^3.4.3",
-    "get-cli-arg": "^5.3.0",
+    "get-cli-arg": "^5.8.0",
     "mkdirp": "^1.0.4",
     "rimraf": "^3.0.2"
   },
