@@ -4,36 +4,43 @@ import { make, inform } from './index.js'
 import * as color from './color.js'
 
 async function bin() {
+	const verbose = getArg('verbose') || Boolean(process.env.TRAVIS_BUILD_WEB_URL)
+	const attempt = getArg('attempt')
 	try {
 		const details = await make()
 		if (details.success) {
+			console.log(color.success('make-deno-edition: SUCCESS!'))
 			console.log(
-				color.success(
-					'make-deno-edition: SUCCESS! The deno edition was created successfully, without any errors.'
-				)
+				`\nThe deno edition was ${color.success(
+					'created successfully'
+				)}, without any errors:`
 			)
-			inform(details, !getArg('attempt'))
-		} else if (getArg('attempt')) {
+			inform(details, verbose)
+		} else if (attempt) {
 			// ignore failure
 			console.log(color.special('make-deno-edition: OK!'))
 			console.log(
-				'The optional deno edition could not be created.\n' +
-					'For details, run make-deno-edition without the --attempt flag.'
+				`\nThe ${color.special('optional')} deno edition ${color.warn(
+					'could not be created'
+				)} for the following reasons:`
 			)
+			inform(details, verbose)
 		} else {
+			console.log(color.error('make-deno-edition: FAILURE!'))
 			console.log(
-				color.error(
-					'make-deno-edition: FAILURE! Unable to make the deno edition.'
-				)
+				`\nThe required deno edition ${color.error(
+					'could not be created'
+				)} for the following reasons:`
 			)
 			inform(details, true)
 			process.exitCode = 1
 		}
 	} catch (err) {
+		console.log(color.error('make-deno-edition: UNEXEPCTED FAILURE!'))
 		console.log(
-			color.error(
-				'make-deno-edition: UNEXEPCTED FAILURE! Unable to make the deno edition, due to this unexpected error:'
-			)
+			`\nUnable to make the deno edition, due to ${color.error(
+				'this unexpected error'
+			)}:`
 		)
 		console.log(color.inspect(err))
 		process.exitCode = 1

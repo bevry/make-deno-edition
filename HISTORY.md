@@ -1,5 +1,10 @@
 # History
 
+## v0.12.0 2020 June 25
+
+-   Improvements to the stdout messages
+-   Failed attempts will now output which files failed, and if `--verbose` is provided (or if it is running on Travis CI) then the complete details are also provided.
+
 ## v0.11.1 2020 June 25
 
 -   Make binary have executable permissions which is reuqired for yarn environments

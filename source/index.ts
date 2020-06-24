@@ -620,7 +620,6 @@ export async function make({
 }
 
 export function inform(details: Details, verbose = false) {
-	console.log()
 	for (const path of Object.keys(details.files).sort()) {
 		const file = details.files[path]
 		if (file.errors.size) {
@@ -646,6 +645,7 @@ export function inform(details: Details, verbose = false) {
 				}
 			}
 		} else {
+			console.log()
 			console.log(color.success(file.label, 'passed'))
 		}
 	}
