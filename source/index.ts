@@ -370,9 +370,13 @@ export interface MakeOpts {
 	 * This excludes tests, which are governed by {@link failOnTestIncompatibility}
 	 */
 	failOnOtherIncompatibility?: boolean
+
+	/** Whether or not to run deno on the file to verify the conversion is compatible */
+	run?: boolean
 }
 
 export async function make({
+	run = true,
 	cwd = process.cwd(),
 	failOnEntryIncompatibility = true,
 	failOnTestIncompatibility = false,
@@ -551,17 +555,19 @@ export async function make({
 	}
 
 	// attempt to run the successful files
-	for (const file of denoFiles) {
-		const args = ['run', ...permArgs, file.denoPath]
-		try {
-			await spawn('deno', args)
-		} catch (err) {
-			file.errors.add(
-				`running deno on the file failed:\n\tdeno ${args.join(' ')}\n\t` +
-					String(err.stderr).replace(/\n/g, '\n\t')
-			)
-			if (file.errors.size && file.necessary) {
-				details.success = false
+	if (run) {
+		for (const file of denoFiles) {
+			const args = ['run', ...permArgs, file.denoPath]
+			try {
+				await spawn('deno', args)
+			} catch (err) {
+				file.errors.add(
+					`running deno on the file failed:\n\tdeno ${args.join(' ')}\n\t` +
+						String(err.stderr).replace(/\n/g, '\n\t')
+				)
+				if (file.errors.size && file.necessary) {
+					details.success = false
+				}
 			}
 		}
 	}

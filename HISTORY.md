@@ -1,5 +1,9 @@
 # History
 
+## v0.13.0 2020 June 25
+
+-   Don't verify files work with deno on Travis CI (unless the new `--run` flag is provided) as it is likely Deno is not present on Travis CI
+
 ## v0.12.0 2020 June 25
 
 -   Improvements to the stdout messages

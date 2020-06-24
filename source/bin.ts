@@ -4,10 +4,12 @@ import { make, inform } from './index.js'
 import * as color from './color.js'
 
 async function bin() {
-	const verbose = getArg('verbose') || Boolean(process.env.TRAVIS_BUILD_WEB_URL)
-	const attempt = getArg('attempt')
+	const travis = Boolean(process.env.TRAVIS_BUILD_WEB_URL)
+	const run = (getArg('run') as boolean) ?? !travis
+	const verbose = getArg('verbose') as boolean
+	const attempt = getArg('attempt') as boolean
 	try {
-		const details = await make()
+		const details = await make({ run })
 		if (details.success) {
 			console.log(color.success('make-deno-edition: SUCCESS!'))
 			console.log(
@@ -15,7 +17,7 @@ async function bin() {
 					'created successfully'
 				)}, without any errors:`
 			)
-			inform(details, verbose)
+			inform(details, verbose ?? travis)
 		} else if (attempt) {
 			// ignore failure
 			console.log(color.special('make-deno-edition: OK!'))
@@ -24,7 +26,7 @@ async function bin() {
 					'could not be created'
 				)} for the following reasons:`
 			)
-			inform(details, verbose)
+			inform(details, verbose ?? travis)
 		} else {
 			console.log(color.error('make-deno-edition: FAILURE!'))
 			console.log(
@@ -32,7 +34,7 @@ async function bin() {
 					'could not be created'
 				)} for the following reasons:`
 			)
-			inform(details, true)
+			inform(details, verbose ?? true)
 			process.exitCode = 1
 		}
 	} catch (err) {

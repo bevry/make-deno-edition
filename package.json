@@ -1,6 +1,6 @@
 {
   "name": "make-deno-edition",
-  "version": "0.12.0",
+  "version": "0.13.0",
   "description": "Make a deno edition of a npm package",
   "homepage": "https://github.com/bevry/make-deno-edition",
   "license": "MIT",
@@ -104,7 +104,7 @@
     "chalk": "^4.1.0",
     "errlop": "3.9.0",
     "fdir": "^3.4.3",
-    "get-cli-arg": "^5.8.0",
+    "get-cli-arg": "^6.0.0",
     "mkdirp": "^1.0.4",
     "rimraf": "^3.0.2"
   },
@@ -119,7 +119,7 @@
     "eslint-plugin-prettier": "^3.1.4",
     "kava": "^5.7.0",
     "prettier": "^2.0.5",
-    "projectz": "^2.10.0",
+    "projectz": "^2.10.1",
     "surge": "^0.21.3",
     "typedoc": "^0.17.7",
     "typescript": "^3.9.5",

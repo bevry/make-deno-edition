@@ -956,6 +956,13 @@ get-cli-arg@^5.8.0:
   dependencies:
     normalify "2.11.0"
 
+get-cli-arg@^6.0.0:
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/get-cli-arg/-/get-cli-arg-6.0.0.tgz#3509dfce14d48f2cc3a9fd6d6798ca4cda873b2c"
+  integrity sha512-FVb9kHF4u4GYuJeyPXeIe0QceJzJbfLClRiWA91QT90qqup8LENE0wIv2XK6FgXlhRJ9R4A4DJpLFSJKWcIQjA==
+  dependencies:
+    normalify "2.15.0"
+
 get-current-line@5.5.0:
   version "5.5.0"
   resolved "https://registry.yarnpkg.com/get-current-line/-/get-current-line-5.5.0.tgz#4db3a73152262488387c1bce69c46c5380de8cac"
@@ -1478,6 +1485,11 @@ normalify@2.11.0:
   resolved "https://registry.yarnpkg.com/normalify/-/normalify-2.11.0.tgz#4e2de5e06e76e4346f8609c7e90781b260ad7481"
   integrity sha512-t17x+NgzhvhnaS0KuYm8yZWkVfThJHAyM5AXUSoKvbbDQXH1TFQr/EPxK0lWi+KcrrGXbsmbEjRjywvk8nUgBQ==
 
+normalify@2.15.0:
+  version "2.15.0"
+  resolved "https://registry.yarnpkg.com/normalify/-/normalify-2.15.0.tgz#5edb3a6eb9191d890338831d2d4c83d56c415f7b"
+  integrity sha512-EmwAc9sutIZwWpntbZESManDanhgyML6vskQx8OgAivguXMWjBsrUu6/JfFpyCFSaK/WXOehhQSunRG3cf0iOA==
+
 oauth-sign@~0.9.0:
   version "0.9.0"
   resolved "https://registry.yarnpkg.com/oauth-sign/-/oauth-sign-0.9.0.tgz#47a7b016baa68b5fa0ecf3dee08a85c679ac6455"
@@ -1611,7 +1623,7 @@ progress@^2.0.0, progress@^2.0.3:
   resolved "https://registry.yarnpkg.com/progress/-/progress-2.0.3.tgz#7e8cf8d8f5b8f239c1bc68beb4eb78567d572ef8"
   integrity sha512-7PiHtLll5LdnKIMw100I+8xJXR5gW2QwWYkT6iJva0bXitZKa/XMrSbdmg3r2Xnaidz9Qumd0VPaMrZlF9V9sA==
 
-projectz@^2.10.0:
+projectz@^2.10.1:
   version "2.10.1"
   resolved "https://registry.yarnpkg.com/projectz/-/projectz-2.10.1.tgz#eb07c043c1887bdc9d914904becb17ced356f827"
   integrity sha512-yFs3fCRz25m643VEv85UzLp0qvk1N0xCqEPMl0Zu1hnTL2fgNuWvFO6Nl5yq00pifxxxffdd5Ts6y8KtGWJ9ZA==
