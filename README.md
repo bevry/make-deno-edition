@@ -39,35 +39,7 @@ Make a deno edition of a npm package
 
 ### Examples
 
-Here is a list of Bevry packages that have used `make-deno-edition` to make themselves compatible with deno:
-
-1.  https://github.com/bevry/ambi
-1.  https://github.com/bevry/arrangekeys
-1.  https://github.com/bevry/badges
-1.  https://github.com/bevry/binaryextensions
-1.  https://github.com/bevry/cachely
-1.  https://github.com/bevry/detect-indentation
-1.  https://github.com/bevry/envfile
-1.  https://github.com/bevry/errlop
-1.  https://github.com/bevry/fellow
-1.  https://github.com/bevry/get-cli-arg
-1.  https://github.com/bevry/getsetdeep
-1.  https://github.com/bevry/ignorefs
-1.  https://github.com/bevry/ignorepatterns
-1.  https://github.com/bevry/istextorbinary
-1.  https://github.com/bevry/links
-1.  https://github.com/bevry/memo
-1.  https://github.com/bevry/native-promise-pool
-1.  https://github.com/bevry/normalify
-1.  https://github.com/bevry/oneday
-1.  https://github.com/bevry/remove-indentation
-1.  https://github.com/bevry/ropo
-1.  https://github.com/bevry/sortobject
-1.  https://github.com/bevry/start-of-week
-1.  https://github.com/bevry/textextensions
-1.  https://github.com/bevry/trim-indentation
-1.  https://github.com/bevry/typechecker
-1.  https://github.com/bevry/valid-module
+[Here is a list of all the packages that make-deno-edition has made compatible with Deno.](https://www.npmjs.com/search?q=keywords:deno-entry)
 
 ### Prerequisites
 
