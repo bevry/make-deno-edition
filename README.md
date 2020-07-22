@@ -32,27 +32,64 @@ Make a deno edition of a npm package
 
 <!-- /DESCRIPTION -->
 
-
-## Usage
-
-[Complete API Documentation.](http://master.make-deno-edition.bevry.surge.sh/docs/globals.html)
+## Overview
 
 ### Examples
 
 [Here is a list of all the packages that make-deno-edition has made compatible with Deno.](https://www.npmjs.com/search?q=keywords:deno-entry)
 
-### Prerequisites
+### The Need
 
-You will be running `make-deno-edition` on a npm package that is written in TypeScript and uses ESM.
+Unlike Node.js and TypeScript, which supports unresolved paths, e.g. `import thing from './file'` and `import thing from './'`, Deno only supports resolved paths, e.g. `import thing from ./file.ts` and `import thing from https://unpkg.com/badges@^4.13.0/edition-deno/index.ts`. This means that anything imported into Deno must be directly resolvable and must use ECMAScript Modules (ESM). This is because Deno has no conception of `package.json`.
 
-Any imports from your package must either:
+Unlike Node.js and TypeScript, which supports `package.json` to specify dependency versions so you can just do `import dep from 'dep'`, instead Deno has no conception of `package.json`, so all dependencies must be imported via their CDN URL with reference to their version number, e.g.  `import dep from https://unpkg.com/dep@^1.0.0/file.ts`.
 
--   be a relative import, that has a corresponding `.ts` file
--   be a URL that a resolves to a `.ts` file (typical deno style)
--   be a dependency that has a `package.json` file, that contains a `deno` entry field, or a `main` field that has a corresponding `.ts` file
--   where a custom package entry was used, there is a corresponding `.ts` file, or a `deno` edition in the `package.json` file such that the deno entry can be inferred
+Deno and Node.js different on their APIs. Several Node.js builtins can be aliases to Deno's `std/node` builtins, however several things such as `__filename`, `__dirname` require a polyfill, and other things have no direct compatibility so require different entries.
 
-If you import a package that is not compatible with deno, but does have source code written in TypeScript using ESM, then fork the imported package, run through the instructions below to generate the deno comptible edition for it, then submit a pull request, so that it has a deno compatible edition, and thus can be used automatically in the future.
+And in the end, you need to hope your dependencies are also compatible with Deno.
+
+
+### The Solution
+
+make-deno-edition is a CLI tool that takes your source edition (whichever directory contains your package's typescript source files) and instantly applies the following changes to create a compatible deno edition in a `deno-edition` directory:
+
+1. bultin imports (e.g. `fs`) are mapped to their corresponding deno `std/node` polyfill
+
+1. certain globals (e.g. `__filename` and `__dirname`) are mappedd to their corresponding deno userland polyfilll
+
+1. internal imports (any relative path to another file inside your source edition) are mapped to their typescript file, e.g. `import thing from './file'` and `import thing from './file.js'` becomes `import thing from './file.ts`
+
+1. remote imports (e.g. any URL) are assumed to be compatible, as node.js doesn't support them, so it is assumed they are already deno compatible
+
+1. dependency imports (e.g. any package you install into node_modules) are checked to see if they have a `deno` field in their `package.json` denoting where to look for the deno compatible entry file, or if their `main` field in the `package.json` ends with `.ts` then it is assumed to be deno compatible
+
+  1. so the more dependencies that `make-deno-edition` is run on, then the more dependents that can become compatible with deno
+
+make-deno-edition will also intelligently ignore compatibility for files that are not essential, such as your test and utility files, but fail if compatibility for an essential file, such as an entry file and its required modules fail
+
+Finally, make-deno-edition will also update your `package.json` file with the details for the deno entry file, as well as the deno edition metadata, such that other packages and toolchains can make use of your deno compatibility.
+
+### Extras
+
+#### `README.md` instructions
+
+Inside the `README.md` file, you should instruct Deno-only users of your package about your Deno entry point, you can do this by instructing them to use the CDN URL and entry for your package:
+
+    <a href="https://deno.land" title="Deno is a secure runtime for JavaScript and TypeScript, it is an alternative for Node.js"><h3>Deno</h3></a>
+
+    ``` typescript
+    import pkg from 'https://unpkg.com/YOURPACKAGENAME@^VERSION/edition-deno/ENTRY.ts'
+    ```
+
+You can use [projectz](https://github.com/bevry/projectz) to automate this, as Bevry has done on all of its packages.
+
+#### Complete Automation
+
+You can use [boundation](https://github.com/bevry/boundation) to automate your entire package scaffolding, maintainence, and compatibility with Deno, Web Browsers, and multiple Node.js versions - generating all the necessary editions to make sure your targets are compatible.
+
+## Usage
+
+[Complete API Documentation.](http://master.make-deno-edition.bevry.surge.sh/docs/globals.html)
 
 ### Preparation
 
