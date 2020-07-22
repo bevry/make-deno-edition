@@ -32,6 +32,7 @@ Make a deno edition of a npm package
 
 <!-- /DESCRIPTION -->
 
+
 ## Overview
 
 ### Examples
@@ -42,12 +43,11 @@ Make a deno edition of a npm package
 
 Unlike Node.js and TypeScript, which supports unresolved paths, e.g. `import thing from './file'` and `import thing from './'`, Deno only supports resolved paths, e.g. `import thing from ./file.ts` and `import thing from https://unpkg.com/badges@^4.13.0/edition-deno/index.ts`. This means that anything imported into Deno must be directly resolvable and must use ECMAScript Modules (ESM). This is because Deno has no conception of `package.json`.
 
-Unlike Node.js and TypeScript, which supports `package.json` to specify dependency versions so you can just do `import dep from 'dep'`, instead Deno has no conception of `package.json`, so all dependencies must be imported via their CDN URL with reference to their version number, e.g.  `import dep from https://unpkg.com/dep@^1.0.0/file.ts`.
+Unlike Node.js and TypeScript, which supports `package.json` to specify dependency versions so you can just do `import dep from 'dep'`, instead Deno has no conception of `package.json`, so all dependencies must be imported via their CDN URL with reference to their version number, e.g. `import dep from https://unpkg.com/dep@^1.0.0/file.ts`.
 
 Deno and Node.js different on their APIs. Several Node.js builtins can be aliases to Deno's `std/node` builtins, however several things such as `__filename`, `__dirname` require a polyfill, and other things have no direct compatibility so require different entries.
 
 And in the end, you need to hope your dependencies are also compatible with Deno.
-
 
 ### The Solution
 
@@ -140,7 +140,6 @@ You can also instruct consumers of your package to directly use your deno editio
     import pkg from 'https://unpkg.com/YOURPACKAGENAME@^VERSION/edition-deno/ENTRY.ts'
     ```
 
-
 ### API
 
 API usage of `make-deno-edition` is to come.
@@ -169,7 +168,8 @@ API usage of `make-deno-edition` is to come.
 
 <ul><li><code>make-deno-edition/source/index.ts</code> is <a href="https://www.typescriptlang.org/" title="TypeScript is a typed superset of JavaScript that compiles to plain JavaScript. ">TypeScript</a> source code with <a href="https://babeljs.io/docs/learn-es2015/#modules" title="ECMAScript Modules">Import</a> for modules</li>
 <li><code>make-deno-edition</code> aliases <code>make-deno-edition/edition-esnext/index.js</code></li>
-<li><code>make-deno-edition/edition-esnext/index.js</code> is <a href="https://www.typescriptlang.org/" title="TypeScript is a typed superset of JavaScript that compiles to plain JavaScript. ">TypeScript</a> compiled against <a href="https://en.wikipedia.org/wiki/ECMAScript#ES.Next" title="ECMAScript Next">ESNext</a> for <a href="https://nodejs.org" title="Node.js is a JavaScript runtime built on Chrome's V8 JavaScript engine">Node.js</a> with <a href="https://nodejs.org/dist/latest-v5.x/docs/api/modules.html" title="Node/CJS Modules">Require</a> for modules</li></ul>
+<li><code>make-deno-edition/edition-esnext/index.js</code> is <a href="https://www.typescriptlang.org/" title="TypeScript is a typed superset of JavaScript that compiles to plain JavaScript. ">TypeScript</a> compiled against <a href="https://en.wikipedia.org/wiki/ECMAScript#ES.Next" title="ECMAScript Next">ESNext</a> for <a href="https://nodejs.org" title="Node.js is a JavaScript runtime built on Chrome's V8 JavaScript engine">Node.js</a> 14 with <a href="https://nodejs.org/dist/latest-v5.x/docs/api/modules.html" title="Node/CJS Modules">Require</a> for modules</li>
+<li><code>make-deno-edition/edition-node-esm/index.js</code> is <a href="https://www.typescriptlang.org/" title="TypeScript is a typed superset of JavaScript that compiles to plain JavaScript. ">TypeScript</a> compiled against <a href="https://en.wikipedia.org/wiki/ECMAScript#ES.Next" title="ECMAScript Next">ESNext</a> for <a href="https://nodejs.org" title="Node.js is a JavaScript runtime built on Chrome's V8 JavaScript engine">Node.js</a> with <a href="https://babeljs.io/docs/learn-es2015/#modules" title="ECMAScript Modules">Import</a> for modules</li></ul>
 
 <!-- /INSTALL -->
 

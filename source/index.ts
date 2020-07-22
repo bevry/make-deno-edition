@@ -61,7 +61,7 @@ const perms: string[] = [
 ]
 
 // https://deno.land/std/node
-const builtins: { [key: string]: boolean } = {
+const builtins: { [key: string]: boolean | string } = {
 	assert: false,
 	buffer: true,
 	child_process: false,
@@ -91,7 +91,8 @@ const builtins: { [key: string]: boolean } = {
 	tls: false,
 	tty: false,
 	url: false,
-	util: true,
+	util:
+		'https://raw.githubusercontent.com/denoland/deno/c5d3385203acaca4a3c63b2270fb92571f4b099c/std/node/util.ts',
 	v8: false,
 	vm: false,
 	worker_threads: false,
@@ -289,7 +290,10 @@ export function convert(path: string, details: Details): File {
 			i.type = 'builtin'
 
 			// check for compat
-			if (compat) {
+			if (typeof compat === 'string') {
+				i.resultTarget = compat
+				continue
+			} else if (compat) {
 				i.resultTarget = `https://deno.land/std/node/${i.package}.ts`
 				continue
 			}
@@ -348,9 +352,23 @@ export function convert(path: string, details: Details): File {
 			result.substring(cursor + i.sourceStatement.length)
 		offset += replacement.length - i.sourceStatement.length
 	}
-	file.result = result
 
-	// return
+	// __filename and __dirname polyfills
+	const f = result.includes('__filename')
+	const d = result.includes('__dirname')
+	if (f || d) {
+		// import url from 'url'
+		// __filename = url.fileURLToPath(import.meta.url)
+		// import { dirname } from 'path'
+		// const __dirname = dirname(__filename)
+		result =
+			`import { __ as __fdPolyfill } from 'https://deno.land/x/dirname/mod.ts';\n` +
+			`const { __filename, __dirname } = __fdPolyfill(import.meta);\n` +
+			result
+	}
+
+	// apply and return
+	file.result = result
 	return file
 }
 

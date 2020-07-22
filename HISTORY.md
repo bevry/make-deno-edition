@@ -1,5 +1,11 @@
 # History
 
+## v0.15.0 2020 June 25
+
+-   Add support for `util.inspect` via [deno#6833](https://github.com/denoland/deno/pull/6833)
+-   Add support for `__dirname` and `__filename` via [deno#2125](https://github.com/denoland/deno/issues/2125)
+-   Updated dependencies, [base files](https://github.com/bevry/base), and [editions](https://editions.bevry.me) using [boundation](https://github.com/bevry/boundation)
+
 ## v0.14.0 2020 June 25
 
 -   Updated dependencies, [base files](https://github.com/bevry/base), and [editions](https://editions.bevry.me) using [boundation](https://github.com/bevry/boundation)
