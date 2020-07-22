@@ -63,7 +63,7 @@ make-deno-edition is a CLI tool that takes your source edition (whichever direct
 
 1. dependency imports (e.g. any package you install into node_modules) are checked to see if they have a `deno` field in their `package.json` denoting where to look for the deno compatible entry file, or if their `main` field in the `package.json` ends with `.ts` then it is assumed to be deno compatible
 
-  1. so the more dependencies that `make-deno-edition` is run on, then the more dependents that can become compatible with deno
+    1. so the more dependencies that `make-deno-edition` is run on, then the more dependents that can become compatible with deno
 
 make-deno-edition will also intelligently ignore compatibility for files that are not essential, such as your test and utility files, but fail if compatibility for an essential file, such as an entry file and its required modules fail
 
