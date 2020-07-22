@@ -69,24 +69,6 @@ make-deno-edition will also intelligently ignore compatibility for files that ar
 
 Finally, make-deno-edition will also update your `package.json` file with the details for the deno entry file, as well as the deno edition metadata, such that other packages and toolchains can make use of your deno compatibility.
 
-### Extras
-
-#### `README.md` instructions
-
-Inside the `README.md` file, you should instruct Deno-only users of your package about your Deno entry point, you can do this by instructing them to use the CDN URL and entry for your package:
-
-    <a href="https://deno.land" title="Deno is a secure runtime for JavaScript and TypeScript, it is an alternative for Node.js"><h3>Deno</h3></a>
-
-    ``` typescript
-    import pkg from 'https://unpkg.com/YOURPACKAGENAME@^VERSION/edition-deno/ENTRY.ts'
-    ```
-
-You can use [projectz](https://github.com/bevry/projectz) to automate this, as Bevry has done on all of its packages.
-
-#### Complete Automation
-
-You can use [boundation](https://github.com/bevry/boundation) to automate your entire package scaffolding, maintainence, and compatibility with Deno, Web Browsers, and multiple Node.js versions - generating all the necessary editions to make sure your targets are compatible.
-
 ## Usage
 
 [Complete API Documentation.](http://master.make-deno-edition.bevry.surge.sh/docs/globals.html)
@@ -142,7 +124,7 @@ The `--attempt` flag will not emit a failure exit code if the deno edition gener
 
 ### Publishing
 
-> If you are using [`boundation`](https://github.com/bevry/boundation) to automatically generate deno compatibility for your npm package, then you can skip this step.
+> If you are using [`boundation`](https://github.com/bevry/boundation) to automatically generate compatible editions (web browsers, deno, multiple node.js versions) for your npm package, then you can skip this step.
 
 > If you are using [`projectz`](https://github.com/bevry/projectz) to automatically generate your `README.md` content, then you can skip this step.
 
@@ -150,7 +132,14 @@ If a deno edition was successfully created, it will be located in the `edition-d
 
 Consumers of your package who use `make-deno-edition` on their own package, will now be able to use your package's deno edition to further their own deno compatibility.
 
-You can also instruct consumers of your package to directly use your deno edition, by informing them of its presence in your `README.md` file. You can use [`projectz`](https://github.com/bevry/projectz) to automatically insert this information for them.
+You can also instruct consumers of your package to directly use your deno edition, by informing them of its presence in your `README.md` file. You can use [`projectz`](https://github.com/bevry/projectz) to automatically insert this information for them, or you can use the following template:
+
+    <a href="https://deno.land" title="Deno is a secure runtime for JavaScript and TypeScript, it is an alternative for Node.js"><h3>Deno</h3></a>
+
+    ``` typescript
+    import pkg from 'https://unpkg.com/YOURPACKAGENAME@^VERSION/edition-deno/ENTRY.ts'
+    ```
+
 
 ### API
 
