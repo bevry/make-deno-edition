@@ -28,7 +28,7 @@
 
 <!-- DESCRIPTION/ -->
 
-Make a deno edition of a npm package
+Automatically makes package.json projects (such as npm packages and node.js modules) compatible with Deno.
 
 <!-- /DESCRIPTION -->
 
@@ -51,7 +51,9 @@ And in the end, you need to hope your dependencies are also compatible with Deno
 
 ### The Solution
 
-make-deno-edition is a CLI tool that takes your source edition (whichever directory contains your package's typescript source files) and instantly applies the following changes to create a compatible deno edition in a `deno-edition` directory:
+make-deno-edition is a CLI tool that takes your source edition (whichever directory contains your package's typescript source files) and creates a compatible deno edition in a `deno-edition` directory.
+
+It provides this compatibility by providing the following transformations:
 
 1. bultin imports (e.g. `fs`) are mapped to their corresponding deno `std/node` polyfill
 
