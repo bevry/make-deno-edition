@@ -142,10 +142,6 @@ You can also instruct consumers of your package to directly use your deno editio
     import pkg from 'https://unpkg.com/YOURPACKAGENAME@^VERSION/edition-deno/ENTRY.ts'
     ```
 
-### API
-
-API usage of `make-deno-edition` is to come.
-
 <!-- INSTALL/ -->
 
 <h2>Install</h2>
