@@ -43,7 +43,7 @@ Automatically makes package.json projects (such as npm packages and node.js modu
 
 Unlike Node.js and TypeScript, which supports unresolved paths, e.g. `import thing from './file'` and `import thing from './'`, Deno only supports resolved paths, e.g. `import thing from './file.ts'` and `import thing from 'https://unpkg.com/badges@^4.13.0/edition-deno/index.ts'`. This means that anything imported into Deno must be directly resolvable and must use ECMAScript Modules (ESM). This is because Deno has no conception of `package.json`.
 
-Unlike Node.js and TypeScript, which supports `package.json` to specify dependency versions so you can just do `import dep from 'dep'`, instead Deno has no conception of `package.json`, so all dependencies must be imported via their CDN URL with reference to their version number, e.g. `import dep from https://unpkg.com/dep@^1.0.0/file.ts`.
+Unlike Node.js and TypeScript, which supports `package.json` to specify dependency versions so you can just do `import dep from 'dep'`, instead Deno has no conception of `package.json`, so all dependencies must be imported via their CDN URL with reference to their version number, e.g. `import dep from 'https://unpkg.com/dep@^1.0.0/file.ts'`.
 
 Deno and Node.js different on their APIs. Several Node.js builtins can be aliases to Deno's `std/node` builtins, however several things such as `__filename`, `__dirname` require a polyfill, and other things have no direct compatibility so require different entries.
 
