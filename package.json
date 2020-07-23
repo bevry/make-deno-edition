@@ -1,7 +1,7 @@
 {
   "name": "make-deno-edition",
   "version": "0.15.0",
-  "description": "Make a deno edition of a npm package",
+  "description": "Automatically makes package.json projects (such as npm packages and node.js modules) compatible with Deno.",
   "homepage": "https://github.com/bevry/make-deno-edition",
   "license": "MIT",
   "keywords": [
@@ -11,6 +11,7 @@
     "editions",
     "node",
     "npm",
+    "transpile",
     "typed",
     "types",
     "typescript",
