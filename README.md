@@ -37,7 +37,18 @@ Automatically makes package.json projects (such as npm packages and node.js modu
 
 ### Examples
 
-[Here is a list of all the packages that make-deno-edition has made compatible with Deno.](https://www.npmjs.com/search?q=keywords:deno-entry)
+[Here is the growing list of all the packages that make-deno-edition has made compatible with Deno.](https://www.npmjs.com/search?q=keywords:deno-entry)
+
+#### Interactive
+
+These are some highlighted packages that have interactive examples for the different targets they support, and whose compatibility for Deno was provided automatically by make-deno-editions, illustrating how easy multi-target production and consumption is of write-once packages.
+
+- [Caterpillar](https://github.com/bevry/caterpillar) is a logging library for Deno, Node.js and Web Browsers, it will pipe to anything that has a write(chunk: any): any method.
+    - [Source Directory](https://github.com/bevry/caterpillar/tree/master/source)
+    - [Deno Example](https://repl.it/@balupton/caterpillar-deno)
+    - [Node.js Example](https://repl.it/@balupton/caterpillar-node)
+    - [Web Browser Example](https://repl.it/@balupton/caterpillar-browser)
+
 
 ### The Need
 
