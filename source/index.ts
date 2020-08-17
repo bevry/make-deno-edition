@@ -90,7 +90,7 @@ const builtins: { [key: string]: boolean | string } = {
 	timers: true,
 	tls: false,
 	tty: false,
-	url: false,
+	url: true,
 	util: true,
 	v8: false,
 	vm: false,
@@ -352,17 +352,14 @@ export function convert(path: string, details: Details): File {
 		offset += replacement.length - i.sourceStatement.length
 	}
 
-	// __filename and __dirname polyfills
-	const f = result.includes('__filename')
-	const d = result.includes('__dirname')
-	if (f || d) {
-		// import url from 'url'
-		// __filename = url.fileURLToPath(import.meta.url)
-		// import { dirname } from 'path'
-		// const __dirname = dirname(__filename)
+	// __filename and __dirname ponyfill
+	if (
+		/__(file|test)name/.test(result) &&
+		/__(file|test)name\s?=/.test(result) === false
+	) {
 		result =
-			`import { __ as __fdPolyfill } from 'https://deno.land/x/dirname/mod.ts';\n` +
-			`const { __filename, __dirname } = __fdPolyfill(import.meta);\n` +
+			`import filedirname from 'https://unpkg.com/filedirname@^1.0.0/edition-deno/index.ts';\n` +
+			`const { __filename, __dirname } = filedirname(import.meta.url);\n` +
 			result
 	}
 
@@ -574,7 +571,7 @@ export async function make({
 	// attempt to run the successful files
 	if (run) {
 		for (const file of denoFiles) {
-			const args = ['run', ...permArgs, file.denoPath]
+			const args = ['run', ...permArgs, '--reload', file.denoPath]
 			try {
 				await spawn('deno', args)
 			} catch (err) {

@@ -1,5 +1,12 @@
 # History
 
+## v1.0.1 2020 August 18
+
+-   Add support for the deno `std/node/url` polyfill
+-   Refresh the deno cache when attempting to run our conversions
+-   Use Bevry's `__dirname` and `__filename` ponyfill as the community one disappeared
+-   Do not use the `__dirname` and `__filename` ponyfill if they are manually set
+
 ## v1.0.0 2020 August 17
 
 -   Bumped to v1 to show that is already stable and production ready, and has been used for [33 packages already](https://www.npmjs.com/search?q=keywords:deno-entry).
