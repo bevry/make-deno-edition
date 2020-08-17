@@ -1,5 +1,11 @@
 # History
 
+## v1.0.0 2020 August 17
+
+-   Bumped to v1 to show that is already stable and production ready, and has been used for [33 packages already](https://www.npmjs.com/search?q=keywords:deno-entry).
+-   Now that [deno v1.3.0](https://github.com/denoland/deno/releases/tag/v1.3.0) is released with [pull request #6833](https://github.com/denoland/deno/pull/6833) merged, use that for `std/node/util` instead of the pull request directly
+-   Updated dependencies, [base files](https://github.com/bevry/base), and [editions](https://editions.bevry.me) using [boundation](https://github.com/bevry/boundation)
+
 ## v0.15.0 2020 June 25
 
 -   Add support for `util.inspect` via [deno#6833](https://github.com/denoland/deno/pull/6833)

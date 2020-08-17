@@ -1,5 +1,5 @@
 /* eslint new-cap:0, no-loop-func:0, camelcase:0  */
-import fdir from 'fdir'
+import { fdir } from 'fdir'
 import Errlop from 'errlop'
 import rimraf from 'rimraf'
 import mkdirp from 'mkdirp'
@@ -91,8 +91,7 @@ const builtins: { [key: string]: boolean | string } = {
 	tls: false,
 	tty: false,
 	url: false,
-	util:
-		'https://raw.githubusercontent.com/denoland/deno/c5d3385203acaca4a3c63b2270fb92571f4b099c/std/node/util.ts',
+	util: true,
 	v8: false,
 	vm: false,
 	worker_threads: false,
