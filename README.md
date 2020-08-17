@@ -43,22 +43,21 @@ Automatically makes package.json projects (such as npm packages and node.js modu
 
 These are some highlighted packages that have interactive examples for the different targets they support, and whose compatibility for Deno was provided automatically by make-deno-editions, illustrating how easy multi-target production and consumption is of write-once packages.
 
-- [Caterpillar](https://github.com/bevry/caterpillar) is a logging library for Deno, Node.js and Web Browsers, it will pipe to anything that has a `write(chunk: any): any` method.
-    - [Source Directory](https://github.com/bevry/caterpillar/tree/master/source)
-    - [Deno Example](https://repl.it/@balupton/caterpillar-deno)
-    - [Node.js Example](https://repl.it/@balupton/caterpillar-node)
-    - [Web Browser Example](https://repl.it/@balupton/caterpillar-browser)
-
+-   [Caterpillar](https://github.com/bevry/caterpillar) is a logging library for Deno, Node.js and Web Browsers, it will pipe to anything that has a `write(chunk: any): any` method.
+    -   [Source Directory](https://github.com/bevry/caterpillar/tree/master/source)
+    -   [Deno Example](https://repl.it/@balupton/caterpillar-deno)
+    -   [Node.js Example](https://repl.it/@balupton/caterpillar-node)
+    -   [Web Browser Example](https://repl.it/@balupton/caterpillar-browser)
 
 ### The Need
 
-Unlike Node.js and TypeScript, which supports unresolved paths, e.g. `import thing from './file'` and `import thing from './'`, Deno only supports resolved paths, e.g. `import thing from './file.ts'` and `import thing from 'https://unpkg.com/badges@^4.13.0/edition-deno/index.ts'`. This means that anything imported into Deno must be directly resolvable and must use ECMAScript Modules (ESM). This is because Deno has no conception of `package.json`.
+**Node.js and TypeScript support unresolved paths**, e.g. `import thing from './file'` and `import thing from './'`. **Deno however, only supports resolved paths**, e.g. `import thing from './file.ts'` and `import thing from 'https://unpkg.com/badges@^4.13.0/edition-deno/index.ts'`. This means that anything imported into Deno must be directly resolvable and must use ECMAScript Modules (ESM).
 
-Unlike Node.js and TypeScript, which supports `package.json` to specify dependency versions so you can just do `import dep from 'dep'`, instead Deno has no conception of `package.json`, so all dependencies must be imported via their CDN URL with reference to their version number, e.g. `import dep from 'https://unpkg.com/dep@^1.0.0/file.ts'`.
+**Node.js and TypeScript support `package.json` files** to specify dependency versions, which enables code like `import dep from 'dep'`. **Deno however, has no conception of `package.json`**, so all dependencies must be imported via a directly resolvable CDN URL, e.g. `import dep from 'https://unpkg.com/dep@^1.0.0/file.ts'`.
 
-Deno and Node.js different on their APIs. Several Node.js builtins can be aliases to Deno's `std/node` builtins, however several things such as `__filename`, `__dirname` require a polyfill, and other things have no direct compatibility so require different entries.
+**Deno and Node.js different on their APIs**. Node.js builtins can be converted to Deno's `std/node` builtins, however several things such as `__filename`, `__dirname` require a polyfill, and other things have no direct compatibility so require different entries.
 
-And in the end, you need to hope your dependencies are also compatible with Deno.
+In the end, **you must hope your dependencies are also compatible with Deno.**
 
 ### The Solution
 
@@ -77,9 +76,9 @@ It provides this compatibility by providing the following transformations:
 1. dependency imports (e.g. any package you install into node_modules) are supported if:
 
     1. If they have a `deno` field in their `package.json`, which will denote where to look for the deno compatible entry file
-    
+
         The more dependencies that `make-deno-edition` is run on, then the more dependencies will automatically have a `deno` entry field, and thus the more dependencies will be automatically compatible with Deno, enabling more dependents to be automatically compatible with Deno.
-    
+
     2. If they have a `main` field in the `package.json` that ends with `.ts` (is a typescript file), then it is assumed to be deno compatible
 
 make-deno-edition will also intelligently ignore compatibility for files that are not essential, such as your test and utility files, but fail if compatibility for an essential file, such as an entry file and its required modules fail
