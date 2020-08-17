@@ -61,7 +61,7 @@ In the end, **you must hope your dependencies are also compatible with Deno.**
 
 ### The Solution
 
-make-deno-edition is a CLI tool that takes your source edition (whichever directory contains your package's typescript source files) and creates a compatible deno edition in a `deno-edition` directory.
+make-deno-edition is a CLI tool that takes your source edition (whichever directory contains your package's typescript source files) and creates a compatible deno edition in a `edition-deno` directory.
 
 It provides this compatibility by providing the following transformations:
 
@@ -69,7 +69,7 @@ It provides this compatibility by providing the following transformations:
 
 1. certain globals (e.g. `__filename` and `__dirname`) are mapped to their corresponding deno userland polyfilll
 
-1. internal imports (any relative path to another file inside your source edition) are mapped to their typescript file, e.g. `import thing from './file'` and `import thing from './file.js'` becomes `import thing from './file.ts`
+1. internal imports (any relativeu path to another file inside your source edition) are mapped to their typescript file, e.g. `import thing from './file'` and `import thing from './file.js'` becomes `import thing from './file.ts`
 
 1. remote imports (e.g. any URL) are assumed to be compatible, as node.js doesn't support them, so it is assumed they are already deno compatible
 
