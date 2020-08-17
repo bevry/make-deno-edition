@@ -354,8 +354,8 @@ export function convert(path: string, details: Details): File {
 
 	// __filename and __dirname ponyfill
 	if (
-		/__(file|test)name/.test(result) &&
-		/__(file|test)name\s?=/.test(result) === false
+		/__(file|dir)name/.test(result) &&
+		/__(file|dir)name\s?=/.test(result) === false
 	) {
 		result =
 			`import filedirname from 'https://unpkg.com/filedirname@^1.0.0/edition-deno/index.ts';\n` +

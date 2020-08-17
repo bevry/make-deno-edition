@@ -1,5 +1,9 @@
 # History
 
+## v1.0.2 2020 August 18
+
+-   Fix `__dirname` detection (regression in v1.0.1)
+
 ## v1.0.1 2020 August 18
 
 -   Add support for the deno `std/node/url` polyfill
