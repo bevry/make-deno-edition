@@ -60,9 +60,12 @@ const perms: string[] = [
 	'write',
 ]
 
+// test ground: https://repl.it/@balupton/match-import#index.js
+const importRegExp = /^(?:import|export) .+? from ['"]([^'"]+)['"]$/gms
+
 // https://deno.land/std/node
 const builtins: { [key: string]: boolean | string } = {
-	assert: false,
+	assert: true,
 	buffer: true,
 	child_process: false,
 	cluster: false,
@@ -193,9 +196,7 @@ export function convert(path: string, details: Details): File {
 	const file = details.files[path]
 
 	// extract imports
-	const matches = file.source.matchAll(
-		/^(?:import|export) .+? from ['"]([^'"]+)['"]$/gm
-	)
+	const matches = file.source.matchAll(importRegExp)
 	for (const match of matches) {
 		const i: Import = {
 			type: null,

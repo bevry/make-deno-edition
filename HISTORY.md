@@ -1,8 +1,13 @@
 # History
 
+## v1.0.3 2020 August 19
+
+-   Fixed multiline imports being ignored
+-   Added support for [std/node/assert polyfills that just landed](https://github.com/denoland/deno/issues/7102)
+
 ## v1.0.2 2020 August 18
 
--   Fix `__dirname` detection (regression in v1.0.1)
+-   Fixed `__dirname` detection (regression in v1.0.1)
 
 ## v1.0.1 2020 August 18
 
