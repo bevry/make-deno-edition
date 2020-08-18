@@ -3,7 +3,7 @@
 ## v1.0.3 2020 August 19
 
 -   Fixed multiline imports being ignored
--   Added support for [std/node/assert polyfills that just landed](https://github.com/denoland/deno/issues/7102)
+-   Added support for [std/node/assert polyfills that just landed](https://github.com/denoland/deno/pull/7091)
 
 ## v1.0.2 2020 August 18
 
