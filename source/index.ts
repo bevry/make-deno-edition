@@ -1,4 +1,4 @@
-/* eslint new-cap:0, no-loop-func:0, camelcase:0  */
+/* eslint new-cap:0, no-loop-func:0, camelcase:0, no-use-before-define:0  */
 import { fdir } from 'fdir'
 import Errlop from 'errlop'
 import rimraf from 'rimraf'
@@ -61,7 +61,8 @@ const perms: string[] = [
 ]
 
 // test ground: https://repl.it/@balupton/match-import#index.js
-const importRegExp = /^(?:import|export) .+? from ['"]([^'"]+)['"]$/gms
+// @todo add tests here instead
+export const importRegExp = /^(?:import|export(?! (?:async|function|interface|type|class))) .+? from ['"]([^'"]+)['"]$/gms
 
 // https://deno.land/std/node
 const builtins: { [key: string]: boolean | string } = {
@@ -324,6 +325,7 @@ export function convert(path: string, details: Details): File {
 				}
 			} else {
 				// invalid dependency import
+				console.dir(i)
 				i.errors.add(
 					`appears to be an uninstalled dependency, install it and try again`
 				)
@@ -359,8 +361,8 @@ export function convert(path: string, details: Details): File {
 		/__(file|dir)name\s?=/.test(result) === false
 	) {
 		result =
-			`import filedirname from 'https://unpkg.com/filedirname@^1.0.0/edition-deno/index.ts';\n` +
-			`const { __filename, __dirname } = filedirname(import.meta.url);\n` +
+			`import filedirname from 'https://unpkg.com/filedirname@^2.0.0/edition-deno/index.ts';\n` +
+			`const [ __filename, __dirname ] = filedirname(import.meta.url);\n` +
 			result
 	}
 

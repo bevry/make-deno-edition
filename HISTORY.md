@@ -1,9 +1,15 @@
 # History
 
+## v1.1.0 2020 September 3
+
+-   Updated for [`filedirname` v2](https://github.com/bevry/filedirname)
+-   Targets Deno >= 1.3.2
+-   Fixed regression from v1.0.3 where export statements could incorrectly continue onto import comments
+
 ## v1.0.3 2020 August 19
 
 -   Fixed multiline imports being ignored
--   Added support for [std/node/assert polyfills that just landed](https://github.com/denoland/deno/pull/7091)
+-   Added support for [`std/node/assert` polyfills that just landed](https://github.com/denoland/deno/pull/7091)
 
 ## v1.0.2 2020 August 18
 
