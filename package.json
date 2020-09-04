@@ -1,6 +1,6 @@
 {
   "name": "make-deno-edition",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Automatically makes package.json projects (such as npm packages and node.js modules) compatible with Deno.",
   "homepage": "https://github.com/bevry/make-deno-edition",
   "license": "MIT",

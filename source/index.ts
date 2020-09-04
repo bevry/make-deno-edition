@@ -325,7 +325,6 @@ export function convert(path: string, details: Details): File {
 				}
 			} else {
 				// invalid dependency import
-				console.dir(i)
 				i.errors.add(
 					`appears to be an uninstalled dependency, install it and try again`
 				)

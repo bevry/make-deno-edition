@@ -1,5 +1,9 @@
 # History
 
+## v1.1.1 2020 September 4
+
+-   Removed a left over debug log
+
 ## v1.1.0 2020 September 3
 
 -   Updated for [`filedirname` v2](https://github.com/bevry/filedirname)
