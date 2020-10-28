@@ -1,5 +1,11 @@
 # History
 
+## v1.2.0 2020 October 29
+
+-   Use the `--unstable` flag when testing compatibility, as some of the `std/node` polyfills require it as they are still unstable
+    -   Closes [issue #47](https://github.com/bevry/make-deno-edition/issues/47)
+-   Updated dependencies, [base files](https://github.com/bevry/base), and [editions](https://editions.bevry.me) using [boundation](https://github.com/bevry/boundation)
+
 ## v1.1.1 2020 September 4
 
 -   Removed a left over debug log

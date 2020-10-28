@@ -1,6 +1,6 @@
 {
   "name": "make-deno-edition",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "description": "Automatically makes package.json projects (such as npm packages and node.js modules) compatible with Deno.",
   "homepage": "https://github.com/bevry/make-deno-edition",
   "license": "MIT",
@@ -9,6 +9,8 @@
     "denoify",
     "edition",
     "editions",
+    "es2020",
+    "esnext",
     "node",
     "npm",
     "transpile",
@@ -68,7 +70,7 @@
     "url": "https://github.com/bevry/make-deno-edition.git"
   },
   "engines": {
-    "node": ">=14"
+    "node": ">=10"
   },
   "editions": [
     {
@@ -76,34 +78,39 @@
       "directory": "source",
       "entry": "index.ts",
       "tags": [
+        "source",
         "typescript",
         "import"
       ],
       "engines": false
     },
     {
-      "description": "TypeScript compiled against ESNext for Node.js 14 with Require for modules",
+      "description": "TypeScript compiled against ESNext for Node.js 10 || 12 || 14 || 15 with Require for modules",
       "directory": "edition-esnext",
       "entry": "index.js",
       "tags": [
+        "compiled",
         "javascript",
         "esnext",
         "require"
       ],
       "engines": {
-        "node": "14"
+        "node": "10 || 12 || 14 || 15",
+        "browsers": false
       }
     },
     {
-      "description": "TypeScript compiled against ESNext for Node.js with Import for modules",
-      "directory": "edition-node-esm",
+      "description": "TypeScript compiled against ESNext for Node.js 12 || 14 || 15 with Import for modules",
+      "directory": "edition-esnext-esm",
       "entry": "index.js",
       "tags": [
+        "compiled",
         "javascript",
+        "esnext",
         "import"
       ],
       "engines": {
-        "node": true,
+        "node": "12 || 14 || 15",
         "browsers": false
       }
     }
@@ -114,42 +121,42 @@
   "main": "edition-esnext/index.js",
   "exports": {
     "node": {
-      "import": "./edition-node-esm/index.js",
+      "import": "./edition-esnext-esm/index.js",
       "require": "./edition-esnext/index.js"
     }
   },
   "dependencies": {
     "@types/rimraf": "^3.0.0",
-    "await-spawn": "^3.0.0",
+    "await-spawn": "^4.0.1",
     "chalk": "^4.1.0",
-    "errlop": "^3.16.0",
+    "errlop": "^4.0.0",
     "fdir": "^4.1.0",
-    "get-cli-arg": "^6.6.0",
+    "get-cli-arg": "^6.7.0",
     "mkdirp": "^1.0.4",
     "rimraf": "^3.0.2"
   },
   "devDependencies": {
-    "@bevry/update-contributors": "^1.16.0",
-    "@typescript-eslint/eslint-plugin": "^4.0.1",
-    "@typescript-eslint/parser": "^4.0.1",
-    "assert-helpers": "^7.0.1",
-    "eslint": "^7.8.1",
-    "eslint-config-bevry": "^3.19.0",
-    "eslint-config-prettier": "^6.11.0",
+    "@bevry/update-contributors": "^1.17.0",
+    "@typescript-eslint/eslint-plugin": "^4.6.0",
+    "@typescript-eslint/parser": "^4.6.0",
+    "assert-helpers": "^8.0.1",
+    "eslint": "^7.12.1",
+    "eslint-config-bevry": "^3.22.0",
+    "eslint-config-prettier": "^6.15.0",
     "eslint-plugin-prettier": "^3.1.4",
-    "kava": "^5.11.0",
-    "prettier": "^2.1.1",
-    "projectz": "^2.15.0",
+    "kava": "^5.12.0",
+    "prettier": "^2.1.2",
+    "projectz": "^2.16.0",
     "surge": "^0.21.6",
-    "typedoc": "^0.19.0",
-    "typescript": "^4.0.2",
-    "valid-directory": "^3.2.0"
+    "typedoc": "^0.19.2",
+    "typescript": "^4.0.5",
+    "valid-directory": "^3.4.0"
   },
   "scripts": {
     "our:clean": "rm -Rf ./docs ./edition* ./es2015 ./es5 ./out ./.next",
-    "our:compile": "npm run our:compile:edition-esnext && npm run our:compile:edition-node-esm && npm run our:compile:types",
+    "our:compile": "npm run our:compile:edition-esnext && npm run our:compile:edition-esnext-esm && npm run our:compile:types",
     "our:compile:edition-esnext": "tsc --module commonjs --target ESNext --outDir ./edition-esnext --project tsconfig.json && ( test ! -d edition-esnext/source || ( mv edition-esnext/source edition-temp && rm -Rf edition-esnext && mv edition-temp edition-esnext ) ) && echo '{\"type\": \"commonjs\"}' > edition-esnext/package.json",
-    "our:compile:edition-node-esm": "tsc --module ESNext --target ESNext --outDir ./edition-node-esm --project tsconfig.json && ( test ! -d edition-node-esm/source || ( mv edition-node-esm/source edition-temp && rm -Rf edition-node-esm && mv edition-temp edition-node-esm ) ) && echo '{\"type\": \"module\"}' > edition-node-esm/package.json",
+    "our:compile:edition-esnext-esm": "tsc --module ESNext --target ESNext --outDir ./edition-esnext-esm --project tsconfig.json && ( test ! -d edition-esnext-esm/source || ( mv edition-esnext-esm/source edition-temp && rm -Rf edition-esnext-esm && mv edition-temp edition-esnext-esm ) ) && echo '{\"type\": \"module\"}' > edition-esnext-esm/package.json",
     "our:compile:types": "tsc --project tsconfig.json --emitDeclarationOnly --declaration --declarationMap --declarationDir ./compiled-types && ( test ! -d compiled-types/source || ( mv compiled-types/source edition-temp && rm -Rf compiled-types && mv edition-temp compiled-types ) )",
     "our:deploy": "echo no need for this project",
     "our:meta": "npm run our:meta:contributors && npm run our:meta:docs && npm run our:meta:projectz",
@@ -180,9 +187,5 @@
   "prettier": {
     "semi": false,
     "singleQuote": true
-  },
-  "boundation": {
-    "desiredNodeVersion": 14,
-    "desiredNodeOnly": true
   }
 }

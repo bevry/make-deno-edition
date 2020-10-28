@@ -573,7 +573,7 @@ export async function make({
 	// attempt to run the successful files
 	if (run) {
 		for (const file of denoFiles) {
-			const args = ['run', ...permArgs, '--reload', file.denoPath]
+			const args = ['run', ...permArgs, '--reload', '--unstable', file.denoPath]
 			try {
 				await spawn('deno', args)
 			} catch (err) {
