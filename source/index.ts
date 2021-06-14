@@ -12,7 +12,7 @@ import spawn from 'await-spawn'
 import * as color from './color.js'
 
 async function rimrafp(p: string) {
-	return new Promise(function (resolve, reject) {
+	return new Promise<void>(function (resolve, reject) {
 		rimraf(p, function (err) {
 			if (err) return reject(err)
 			resolve()
@@ -62,7 +62,8 @@ const perms: string[] = [
 
 // test ground: https://repl.it/@balupton/match-import#index.js
 // @todo add tests here instead
-export const importRegExp = /^(?:import|export(?! (?:async|function|interface|type|class))) .+? from ['"]([^'"]+)['"]$/gms
+export const importRegExp =
+	/^(?:import|export(?! (?:async|function|interface|type|class))) .+? from ['"]([^'"]+)['"]$/gms
 
 // https://deno.land/std/node
 const builtins: { [key: string]: boolean | string } = {

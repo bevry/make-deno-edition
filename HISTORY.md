@@ -1,5 +1,9 @@
 # History
 
+## v1.3.0 2021 June 14
+
+-   Updated dependencies, [base files](https://github.com/bevry/base), and [editions](https://editions.bevry.me) using [boundation](https://github.com/bevry/boundation)
+
 ## v1.2.0 2020 October 29
 
 -   Use the `--unstable` flag when testing compatibility, as some of the `std/node` polyfills require it as they are still unstable

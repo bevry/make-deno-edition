@@ -6,8 +6,8 @@
     "maxNodeModuleJsDepth": 5,
     "moduleResolution": "Node",
     "strict": true,
-    "target": "ESNext",
-    "lib": ["es2020.string", "ESNext"],
+    "target": "ES2020",
+    "lib": ["es2020.string"],
     "module": "ESNext"
   },
   "include": ["source"]
