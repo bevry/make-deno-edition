@@ -132,7 +132,7 @@
     "fdir": "^5.1.0",
     "get-cli-arg": "^7.0.0",
     "mkdirp": "^1.0.4",
-    "rimraf": "^3.0.2"
+    "rimraf": "^5.0.5"
   },
   "devDependencies": {
     "@bevry/update-contributors": "^1.18.0",
