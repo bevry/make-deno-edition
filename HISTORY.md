@@ -1,5 +1,15 @@
 # History
 
+## v2.0.0 2023 November 24
+
+-   It's been 2 years, 5 months and 8 days (total 891 days) since the last update to `make-deno-edition` and a lot has changed! This release incorporates all of it! Expect a lot more successful Deno editions being made. Shoutout to my [GitHub Sponsors](https://github.com/sponsors/balupton) for affording me the time to make this happen.
+-   Updated builtin compatibility table
+-   Use `esh.sh` where appropriate
+-   Use and understand `node:` and `npm:` prefixes where appropriate
+-   Update `filedirname` fallback to use `node:filedirname` instead of a fragile URL
+-   Update internals to make use of the `@bevry/fs-*` and `@bevry/json` utilities instead
+-   Updated dependencies, [base files](https://github.com/bevry/base), and [editions](https://editions.bevry.me) using [boundation](https://github.com/bevry/boundation)
+
 ## v1.3.0 2021 June 14
 
 -   Updated dependencies, [base files](https://github.com/bevry/base), and [editions](https://editions.bevry.me) using [boundation](https://github.com/bevry/boundation)

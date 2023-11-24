@@ -1,42 +1,21 @@
 /* eslint new-cap:0, no-loop-func:0, camelcase:0, no-use-before-define:0  */
-import { fdir } from 'fdir'
-import Errlop from 'errlop'
-import rimraf from 'rimraf'
-import mkdirp from 'mkdirp'
 
+// builtin
 import { resolve, join, extname, dirname } from 'path'
-import { promises as fsPromises, exists as fsExists } from 'fs'
 
+// external
+import list from '@bevry/fs-list'
+import remove from '@bevry/fs-remove'
+import { isReadable } from '@bevry/fs-readable'
+import readFile from '@bevry/fs-read'
+import writeFile from '@bevry/fs-write'
+import { readJSON, writeJSON } from '@bevry/json'
+import Errlop from 'errlop'
+import mkdirp from 'mkdirp'
 import spawn from 'await-spawn'
 
+// local
 import * as color from './color.js'
-
-async function rimrafp(p: string) {
-	return new Promise<void>(function (resolve, reject) {
-		rimraf(p, function (err) {
-			if (err) return reject(err)
-			resolve()
-		})
-	})
-}
-const { readFile, writeFile } = fsPromises
-async function exists(p: string) {
-	return new Promise(function (resolve) {
-		fsExists(p, resolve)
-	})
-}
-async function readJSON(path: string) {
-	return JSON.parse(await readFile(path, 'utf-8'))
-}
-async function writeJSON(path: string, data: object) {
-	const str = JSON.stringify(data, null, '  ')
-	await writeFile(path, str, 'utf-8')
-}
-
-async function ensureFile(p: string, data: string) {
-	await mkdirp(dirname(p))
-	return await writeFile(p, data)
-}
 
 const trim: string[] = [
 	'cross-fetch',
@@ -65,42 +44,50 @@ const perms: string[] = [
 export const importRegExp =
 	/^(?:import|export(?! (?:async|function|interface|type|class))) .+? from ['"]([^'"]+)['"]$/gms
 
-// https://deno.land/std/node
-const builtins: { [key: string]: boolean | string } = {
-	assert: true,
-	buffer: true,
-	child_process: false,
-	cluster: false,
-	console: false,
-	crypto: false,
-	dgram: false,
-	dns: false,
-	events: true,
-	fs: true,
-	http: false,
-	http2: false,
-	https: false,
-	module: true,
-	net: false,
-	os: true,
-	path: true,
-	perf_hooks: false,
-	process: true,
-	querystring: true,
-	readline: false,
-	repl: false,
-	stream: false,
-	string_decoder: false,
-	sys: false,
-	timers: true,
-	tls: false,
-	tty: false,
-	url: true,
-	util: true,
-	v8: false,
-	vm: false,
-	worker_threads: false,
-	zlib: false,
+// https://docs.deno.com/runtime/manual/node/compatibility
+const builtins: { [key: string]: 'full' | 'partial' | 'none' } = {
+	assert: 'full',
+	async_hooks: 'partial',
+	buffer: 'full',
+	child_process: 'partial',
+	cluster: 'none',
+	console: 'full',
+	crypto: 'partial',
+	dgram: 'partial',
+	diagnostics_channel: 'full',
+	dns: 'partial',
+	domain: 'none',
+	events: 'full',
+	fs: 'partial',
+	http: 'partial',
+	http2: 'partial',
+	https: 'partial',
+	inspector: 'partial',
+	module: 'full',
+	net: 'partial',
+	os: 'full',
+	path: 'full',
+	perf_hooks: 'partial',
+	punycode: 'full',
+	process: 'partial',
+	querystring: 'full',
+	readline: 'full',
+	repl: 'partial',
+	stream: 'full',
+	string_decoder: 'partial',
+	sys: 'full',
+	test: 'partial',
+	timers: 'full',
+	tls: 'partial',
+	trace_events: 'none',
+	tty: 'partial',
+	util: 'full',
+	url: 'full',
+	v8: 'partial',
+	vm: 'partial',
+	wasi: 'none',
+	worker_threads: 'partial',
+	zlib: 'partial',
 }
 
 export interface CompatibilityStatus {
@@ -115,15 +102,15 @@ export interface Import {
 	 * - dep imports are mapped to a typescript entry, via manual entry, deno entry, or main entry
 	 * - builtin imports are proxied to their deno compat layer if available
 	 */
-	type: null | 'internal' | 'remote' | 'dep' | 'builtin'
+	type: null | 'internal' | 'remote' | 'dep' | 'builtin' | 'unnecessary'
 	label: string
 	sourceIndex: number
 	sourceStatement: string
 	sourceTarget: string
 	resultStatement?: string
 	resultTarget?: string
-	package?: string
-	entry?: string
+	name: string
+	entry: string
 	dep?: Dependency
 	path?: string
 	file?: File
@@ -164,8 +151,9 @@ export interface Dependency {
 	name: string
 	version: string
 	// json: any
-	entry?: string
-	url: string
+	denoEntry: string | null
+	unpkg: string
+	esmsh: string
 	errors: Set<string>
 }
 
@@ -182,7 +170,7 @@ export interface Details {
 function replaceImportStatement(
 	sourceStatement: string,
 	sourceTarget: string,
-	resultTarget: string
+	resultTarget: string,
 ) {
 	if (!resultTarget) return ''
 	const parts = sourceStatement.split(' ')
@@ -191,6 +179,29 @@ function replaceImportStatement(
 		.concat([lastPart!.replace(sourceTarget, resultTarget)])
 		.join(' ')
 	return replacement
+}
+
+function extractPackageNameAndEntry(
+	input: string,
+): [name: string, entry: string] {
+	let name = '',
+		entry = ''
+	// determine it's entry
+	if (input.includes('/')) {
+		// custom entry, extract parts
+		const parts = input.split('/')
+		name = parts.shift()!
+		// if dep is a scoped package, then include the next part
+		if (name[0] === '@') {
+			name += '/' + parts.shift()
+		}
+		// remaining parts will be the manual entry
+		entry = parts.join('/')
+	} else {
+		name = input
+	}
+	// return
+	return [name, entry]
 }
 
 export function convert(path: string, details: Details): File {
@@ -203,134 +214,110 @@ export function convert(path: string, details: Details): File {
 		const i: Import = {
 			type: null,
 			label: match[1],
+			name: '',
+			entry: '',
 			sourceIndex: match.index!,
 			sourceStatement: match[0],
 			sourceTarget: match[1],
 			errors: new Set<string>(),
 		}
-		file.imports.push(i)
-	}
-
-	// check the compat of each import
-	for (const i of file.imports) {
-		const { sourceTarget } = i
-
-		// check if local dependency, if so, ensure .ts extension
-		// and ensure it is supported itself
-		if (sourceTarget.startsWith('.')) {
+		// types
+		if (i.sourceTarget.startsWith('.')) {
 			i.type = 'internal'
+		} else if (i.sourceTarget.startsWith('node:')) {
+			i.type = 'builtin'
+			const [name, entry] = extractPackageNameAndEntry(
+				i.sourceTarget.substring(5),
+			)
+			i.name = name
+			i.entry = entry
+		} else if (i.sourceTarget.startsWith('npm:')) {
+			i.type = 'dep'
+			const [name, entry] = extractPackageNameAndEntry(
+				i.sourceTarget.substring(4),
+			)
+			i.name = name
+			i.entry = entry
+		} else if (i.sourceTarget.includes(':') || i.sourceTarget.startsWith('/')) {
+			i.type = 'remote'
+		} else {
+			// everything else must also be a dependency
+			i.type = 'dep'
+			const [name, entry] = extractPackageNameAndEntry(i.sourceTarget)
+			i.name = name
+			i.entry = entry
+		}
 
+		// handle modifications
+		if (i.type === 'internal') {
 			// ensure extension
-			if (sourceTarget.endsWith('/')) {
-				i.resultTarget = sourceTarget + 'index.ts'
+			if (i.sourceTarget.endsWith('/')) {
+				i.resultTarget = i.sourceTarget + 'index.ts'
 			} else {
-				const ext = extname(sourceTarget)
+				const ext = extname(i.sourceTarget)
 				if (ext === '') {
-					i.resultTarget = sourceTarget + '.ts'
+					i.resultTarget = i.sourceTarget + '.ts'
 				} else if (ext) {
-					i.resultTarget = sourceTarget.replace(ext, '.ts')
+					i.resultTarget = i.sourceTarget.replace(ext, '.ts')
 				}
 			}
-
 			// check the path
 			i.path = resolve(dirname(path), i.resultTarget!)
 			i.file = details.files[i.path]
 			if (!i.file) {
 				i.errors.add(
-					`resolves to [${i.path}] which is not a typescript file inside the source edition`
+					`resolves to [${i.path}] which is not a typescript file inside the source edition`,
 				)
-				// skip
-				continue
 			}
-
-			// check of i.file.errors happens later
-
-			// success
-			continue
-		}
-
-		// check if remote depednency, if so, ignore
-		if (
-			sourceTarget.startsWith('http:') ||
-			sourceTarget.startsWith('https:') ||
-			sourceTarget.startsWith('/')
-		) {
-			i.type = 'remote'
-			i.resultTarget = sourceTarget
-			continue
-		}
-
-		// anything left over must be a dependency
-		i.type = 'dep'
-
-		// extract manual entry from package
-		if (sourceTarget.includes('/')) {
-			// custom entry, extract parts
-			const parts = sourceTarget.split('/')
-			i.package = parts.shift()!
-			// if dep is a scoped package, then include the next part
-			if (i.package[0] === '@') {
-				i.package += '/' + parts.shift()
-			}
-			// remaining parts will be the manual entry
-			i.entry = parts.join('/')
-			// actually continue
-		} else {
-			// no custom entry
-			i.package = sourceTarget
-		}
-
-		// check if unnecessary
-		if (!i.entry && trim.includes(i.package)) {
-			i.resultTarget = ''
-			continue
-		}
-
-		// check if builtin
-		const compat = builtins[i.package] ?? null
-		if (!i.entry && compat !== null) {
-			i.type = 'builtin'
-
-			// check for compat
-			if (typeof compat === 'string') {
-				i.resultTarget = compat
-				continue
-			} else if (compat) {
-				i.resultTarget = `https://deno.land/std/node/${i.package}.ts`
-				continue
-			}
-
-			// fail as the builtin does not yet have a compatibility proxy
-			i.errors.add(
-				`is a node.js builtin that does not yet have a deno compatibility layer`
-			)
-			continue
-		}
-		// not a builtin, is a dependency, check if installed
-		else {
-			// check if package, if so, check for deno entry, if so use that, otherwise use main
-			i.dep = details.deps[i.package]
-			if (i.dep) {
-				// apply
-				const entry = i.entry || i.dep.entry || ''
-				i.resultTarget = i.dep.url + '/' + entry
-
-				// check of i.dep.errors happens later
-
-				// fail if invalid entry
-				if (!entry.endsWith('.ts')) {
+		} else if (i.type === 'dep') {
+			const builtin = builtins[i.name] ?? null
+			if (builtin) {
+				// is builtin
+				i.type = 'builtin'
+				if (builtin === 'full' || builtin === 'partial') {
+					// compatible
+					i.resultTarget = i.entry
+						? `node:${i.name}/${i.entry}`
+						: `node:${i.name}`
+				} else {
+					// incompatible
 					i.errors.add(
-						`resolved to [${i.package}/${entry}], which does not have the .ts extension`
+						`is a node.js builtin that does not yet have a deno compatibility layer`,
 					)
-					continue
 				}
+			} else if (!i.entry && trim.includes(i.name)) {
+				// is unnecessary
+				i.type = 'unnecessary'
+				i.resultTarget = ''
 			} else {
-				// invalid dependency import
-				i.errors.add(
-					`appears to be an uninstalled dependency, install it and try again`
-				)
+				// is dependency, check if installed
+				i.dep = details.deps[i.name]
+				if (i.dep) {
+					// use manual entry, then deno entry, then no entry
+					const entry = i.entry || i.dep.denoEntry || ''
+					// verify the entry is compatible
+					if (entry && !entry.endsWith('.ts')) {
+						// check of i.dep.errors happens later
+						i.errors.add(
+							`resolved to [${i.name}/${entry}], which does not have the .ts extension`,
+						)
+					}
+					// if entry, use unpkg, if no entry, use esmsh
+					i.resultTarget = entry ? i.dep.unpkg + '/' + entry : i.dep.esmsh
+				} else {
+					// not installed, use npm: prefix
+					i.resultTarget = `npm:${i.name}`
+				}
 			}
 		}
+
+		// default result target
+		if (i.resultTarget == null) {
+			i.resultTarget = i.sourceTarget
+		}
+
+		// continue
+		file.imports.push(i)
 	}
 
 	// perform the replacements
@@ -339,14 +326,14 @@ export function convert(path: string, details: Details): File {
 	for (const i of file.imports) {
 		i.label = `${i.type} import of [${i.sourceTarget}] => [${i.resultTarget}]`
 		if (i.resultTarget == null) {
-			// error case
+			// no modification necessary
 			continue
 		}
 		const cursor = i.sourceIndex + offset
 		const replacement = replaceImportStatement(
 			i.sourceStatement,
 			i.sourceTarget,
-			i.resultTarget
+			i.resultTarget,
 		)
 		result =
 			result.substring(0, cursor) +
@@ -361,7 +348,9 @@ export function convert(path: string, details: Details): File {
 		/__(file|dir)name\s?=/.test(result) === false
 	) {
 		result =
-			`import filedirname from 'https://unpkg.com/filedirname@^2.0.0/edition-deno/index.ts';\n` +
+			`import filedirname from '${
+				details.deps.filedirname?.esmsh || 'npm:filedirname'
+			};\n` +
 			`const [ __filename, __dirname ] = filedirname(import.meta.url);\n` +
 			result
 	}
@@ -401,8 +390,8 @@ export async function make({
 }: MakeOpts = {}): Promise<Details> {
 	// paths
 	const pkgPath = join(cwd, 'package.json')
-	const pkg = await readJSON(pkgPath).catch((err) =>
-		Promise.reject(new Errlop('require package.json file to be present', err))
+	const pkg: any = await readJSON(pkgPath).catch((err: any) =>
+		Promise.reject(new Errlop('require package.json file to be present', err)),
 	)
 
 	// prepare
@@ -430,7 +419,7 @@ export async function make({
 	) {
 		throw new Error(
 			'make-deno-edition requires you to define the edition entry for the typescript source code\n' +
-				'refer to https://github.com/bevry/make-deno-edition and https://editions.bevry.me for details'
+				'refer to https://github.com/bevry/make-deno-edition and https://editions.bevry.me for details',
 		)
 	}
 
@@ -438,19 +427,17 @@ export async function make({
 	const sourceEditionPath = join(cwd, sourceEdition.directory)
 
 	// get the deno entry
-	const denoEntry = (await exists(join(sourceEditionPath, 'deno.ts')))
+	const denoEntry = (await isReadable(join(sourceEditionPath, 'deno.ts')))
 		? 'deno.ts'
 		: sourceEdition.entry
 
 	// get the source edition files
-	const api = new fdir()
-		.withFullPaths()
+	const paths = (await list(sourceEditionPath))
 		.filter((path) => path.endsWith('.ts'))
-		.crawl(sourceEditionPath)
-	const paths = (await api.withPromise()) as string[]
+		.map((path) => join(sourceEditionPath, path))
 
 	// delete the old files
-	await rimrafp(denoEditionPath)
+	await remove(denoEditionPath)
 
 	// prepare details
 	const details: Details = {
@@ -461,7 +448,7 @@ export async function make({
 
 	// add the dependencies
 	for (const [name, version] of Object.entries(
-		Object.assign({}, pkg.dependencies || {}, pkg.devDependencies || {})
+		Object.assign({}, pkg.dependencies || {}, pkg.devDependencies || {}),
 	)) {
 		if (details.deps[name]) {
 			throw new Error(`[${name}] dependency is duplicated`)
@@ -469,20 +456,20 @@ export async function make({
 			const dep: Dependency = {
 				name,
 				version: version as string,
-				url: `https://unpkg.com/${name}@${version}`,
+				denoEntry: null,
+				unpkg: `https://unpkg.com/${name}@${version}`, // compatible with entries, as entire package is available
+				esmsh: `https://esm.sh/${name}@${version}`, // only supports deno entries it seems
 				errors: new Set<string>(),
 			}
 
 			const path = join(nm, name, 'package.json')
 			try {
-				const pkg = await readJSON(path)
-				const deno = pkg?.deno
-				const main = pkg?.main
-				dep.entry = deno || main
+				const pkg: any = await readJSON(path)
+				dep.denoEntry = pkg?.deno || null
 			} catch (err) {
 				// don't change success, as this dependency may not be actually be used
 				dep.errors.add(
-					`dependency [${name}] does not appear installed, as [${path}] was not valid JSON, install the dependency and try again`
+					`dependency [${name}] does not appear installed, as [${path}] was not valid JSON, install the dependency and try again`,
 				)
 			}
 
@@ -494,7 +481,7 @@ export async function make({
 	await Promise.all(
 		paths.map(async (path) => {
 			const filename = path.replace(sourceEditionPath + '/', '')
-			const source = await readFile(path, 'utf-8')
+			const source = await readFile(path)
 			let necessary: boolean
 			let label: string
 
@@ -521,7 +508,7 @@ export async function make({
 				errors: new Set<string>(),
 			}
 			details.files[path] = file
-		})
+		}),
 	)
 
 	// convert all the files
@@ -536,12 +523,12 @@ export async function make({
 				// bubble dep import errors
 				if (i.dep?.errors.size)
 					i.errors.add(
-						`import of dependency [${i.dep.name}] has incompatibilities`
+						`import of dependency [${i.dep.name}] has incompatibilities`,
 					)
 				// bubble file import errors
 				if (i.file?.errors.size)
 					i.errors.add(
-						`import of local file [${i.sourceTarget}] has incompatibilities`
+						`import of local file [${i.sourceTarget}] has incompatibilities`,
 					)
 				// bubble import errors
 				if (i.errors.size) file.errors.add(`has import incompatibilities`)
@@ -565,7 +552,7 @@ export async function make({
 			if (file.errors.size === 0) {
 				if (file.result == null)
 					throw new Error('the file had no errors, yet had no content')
-				await ensureFile(file.denoPath, file.result)
+				await writeFile(file.denoPath, file.result)
 				denoFiles.push(file)
 			}
 		}
@@ -577,10 +564,10 @@ export async function make({
 			const args = ['run', ...permArgs, '--reload', '--unstable', file.denoPath]
 			try {
 				await spawn('deno', args)
-			} catch (err) {
+			} catch (err: any) {
 				file.errors.add(
 					`running deno on the file failed:\n\tdeno ${args.join(' ')}\n\t` +
-						String(err.stderr).replace(/\n/g, '\n\t')
+						String(err.stderr).replace(/\n/g, '\n\t'),
 				)
 				if (file.errors.size && file.necessary) {
 					details.success = false
@@ -591,7 +578,7 @@ export async function make({
 
 	// delete deno edition entry, will be re-added later if it is suitable
 	pkg.editions = pkg.editions.filter(
-		(e: any) => e.directory !== denoEditionDirectory
+		(e: any) => e.directory !== denoEditionDirectory,
 	)
 
 	// change package.json for success

@@ -10,18 +10,18 @@
 <span class="badge-githubworkflow"><a href="https://github.com/bevry/make-deno-edition/actions?query=workflow%3Abevry" title="View the status of this project's GitHub Workflow: bevry"><img src="https://github.com/bevry/make-deno-edition/workflows/bevry/badge.svg" alt="Status of the GitHub Workflow: bevry" /></a></span>
 <span class="badge-npmversion"><a href="https://npmjs.org/package/make-deno-edition" title="View this project on NPM"><img src="https://img.shields.io/npm/v/make-deno-edition.svg" alt="NPM version" /></a></span>
 <span class="badge-npmdownloads"><a href="https://npmjs.org/package/make-deno-edition" title="View this project on NPM"><img src="https://img.shields.io/npm/dm/make-deno-edition.svg" alt="NPM downloads" /></a></span>
-<span class="badge-daviddm"><a href="https://david-dm.org/bevry/make-deno-edition" title="View the status of this project's dependencies on DavidDM"><img src="https://img.shields.io/david/bevry/make-deno-edition.svg" alt="Dependency Status" /></a></span>
-<span class="badge-daviddmdev"><a href="https://david-dm.org/bevry/make-deno-edition#info=devDependencies" title="View the status of this project's development dependencies on DavidDM"><img src="https://img.shields.io/david/dev/bevry/make-deno-edition.svg" alt="Dev Dependency Status" /></a></span>
 <br class="badge-separator" />
 <span class="badge-githubsponsors"><a href="https://github.com/sponsors/balupton" title="Donate to this project using GitHub Sponsors"><img src="https://img.shields.io/badge/github-donate-yellow.svg" alt="GitHub Sponsors donate button" /></a></span>
+<span class="badge-thanksdev"><a href="https://thanks.dev/u/gh/bevry" title="Donate to this project using ThanksDev"><img src="https://img.shields.io/badge/thanksdev-donate-yellow.svg" alt="ThanksDev donate button" /></a></span>
 <span class="badge-patreon"><a href="https://patreon.com/bevry" title="Donate to this project using Patreon"><img src="https://img.shields.io/badge/patreon-donate-yellow.svg" alt="Patreon donate button" /></a></span>
-<span class="badge-flattr"><a href="https://flattr.com/profile/balupton" title="Donate to this project using Flattr"><img src="https://img.shields.io/badge/flattr-donate-yellow.svg" alt="Flattr donate button" /></a></span>
 <span class="badge-liberapay"><a href="https://liberapay.com/bevry" title="Donate to this project using Liberapay"><img src="https://img.shields.io/badge/liberapay-donate-yellow.svg" alt="Liberapay donate button" /></a></span>
 <span class="badge-buymeacoffee"><a href="https://buymeacoffee.com/balupton" title="Donate to this project using Buy Me A Coffee"><img src="https://img.shields.io/badge/buy%20me%20a%20coffee-donate-yellow.svg" alt="Buy Me A Coffee donate button" /></a></span>
 <span class="badge-opencollective"><a href="https://opencollective.com/bevry" title="Donate to this project using Open Collective"><img src="https://img.shields.io/badge/open%20collective-donate-yellow.svg" alt="Open Collective donate button" /></a></span>
 <span class="badge-crypto"><a href="https://bevry.me/crypto" title="Donate to this project using Cryptocurrency"><img src="https://img.shields.io/badge/crypto-donate-yellow.svg" alt="crypto donate button" /></a></span>
 <span class="badge-paypal"><a href="https://bevry.me/paypal" title="Donate to this project using Paypal"><img src="https://img.shields.io/badge/paypal-donate-yellow.svg" alt="PayPal donate button" /></a></span>
-<span class="badge-wishlist"><a href="https://bevry.me/wishlist" title="Buy an item on our wishlist for us"><img src="https://img.shields.io/badge/wishlist-donate-yellow.svg" alt="Wishlist browse button" /></a></span>
+<br class="badge-separator" />
+<span class="badge-discord"><a href="https://discord.gg/nQuXddV7VP" title="Join this project's community on Discord"><img src="https://img.shields.io/discord/1147436445783560193?logo=discord&amp;label=discord" alt="Discord server badge" /></a></span>
+<span class="badge-twitch"><a href="https://www.twitch.tv/balupton" title="Join this project's community on Twitch"><img src="https://img.shields.io/twitch/status/balupton?logo=twitch" alt="Twitch community badge" /></a></span>
 
 <!-- /BADGES -->
 
@@ -39,16 +39,6 @@ Automatically makes package.json projects (such as npm packages and node.js modu
 
 [Here is the growing list of all the packages that make-deno-edition has made compatible with Deno.](https://www.npmjs.com/search?q=keywords:deno-entry)
 
-#### Interactive
-
-These are some highlighted packages that have interactive examples for the different targets they support, and whose compatibility for Deno was provided automatically by make-deno-editions, illustrating how easy multi-target production and consumption is of write-once packages.
-
--   [Caterpillar](https://github.com/bevry/caterpillar) is a logging library for Deno, Node.js and Web Browsers, it will pipe to anything that has a `write(chunk: any): any` method.
-    -   [Source Directory](https://github.com/bevry/caterpillar/tree/master/source)
-    -   [Deno Example](https://repl.it/@balupton/caterpillar-deno)
-    -   [Node.js Example](https://repl.it/@balupton/caterpillar-node)
-    -   [Web Browser Example](https://repl.it/@balupton/caterpillar-browser)
-
 ### The Need
 
 **Node.js and TypeScript support unresolved paths**, e.g. `import thing from './file'` and `import thing from './'`. **Deno however, only supports resolved paths**, e.g. `import thing from './file.ts'` and `import thing from 'https://unpkg.com/badges@^4.13.0/edition-deno/index.ts'`. This means that anything imported into Deno must be directly resolvable and must use ECMAScript Modules (ESM).
@@ -65,21 +55,23 @@ make-deno-edition is a CLI tool that takes your source edition (whichever direct
 
 It provides this compatibility by providing the following transformations:
 
-1. bultin imports (e.g. `fs`) are mapped to their corresponding deno `std/node` polyfill
+1. bultin imports (e.g. `fs`) are mapped to their corresponding deno `node:*` polyfill
 
 1. certain globals (e.g. `__filename` and `__dirname`) are mapped to their corresponding deno userland polyfilll
 
-1. internal imports (any relativeu path to another file inside your source edition) are mapped to their typescript file, e.g. `import thing from './file'` and `import thing from './file.js'` becomes `import thing from './file.ts`
+1. internal imports (any relative path to another file inside your source edition) are mapped to their typescript file, e.g. `import thing from './file'` and `import thing from './file.js'` becomes `import thing from './file.ts`
 
 1. remote imports (e.g. any URL) are assumed to be compatible, as node.js doesn't support them, so it is assumed they are already deno compatible
 
-1. dependency imports (e.g. any package you install into node_modules) are supported if:
+1. dependency imports (e.g. any package you install into node_modules) are supported by:
 
-    1. If they have a `deno` field in their `package.json`, which will denote where to look for the deno compatible entry file
+    1. If they have a `deno` field in their `package.json`, which will denote where to look for the deno compatible entry file, then it's direct unpkg URL will be used.
 
         The more dependencies that `make-deno-edition` is run on, then the more dependencies will automatically have a `deno` entry field, and thus the more dependencies will be automatically compatible with Deno, enabling more dependents to be automatically compatible with Deno.
 
-    2. If they have a `main` field in the `package.json` that ends with `.ts` (is a typescript file), then it is assumed to be deno compatible
+    2. If they are an installed dependency, their esm.sh URL will be used.
+
+    3. If they are an uninstalled dependency, the `npm:` prefix will be used.
 
 make-deno-edition will also intelligently ignore compatibility for files that are not essential, such as your test and utility files, but fail if compatibility for an essential file, such as an entry file and its required modules fail
 
@@ -87,7 +79,7 @@ Finally, make-deno-edition will also update your `package.json` file with the de
 
 ## Usage
 
-[Complete API Documentation.](http://master.make-deno-edition.bevry.surge.sh/docs/globals.html)
+[Complete API Documentation.](http://master.make-deno-edition.bevry.surge.sh/docs/)
 
 ### Preparation
 
@@ -179,9 +171,10 @@ You can also instruct consumers of your package to directly use your deno editio
 <p>This package is published with the following editions:</p>
 
 <ul><li><code>make-deno-edition/source/index.ts</code> is <a href="https://www.typescriptlang.org/" title="TypeScript is a typed superset of JavaScript that compiles to plain JavaScript. ">TypeScript</a> source code with <a href="https://babeljs.io/docs/learn-es2015/#modules" title="ECMAScript Modules">Import</a> for modules</li>
-<li><code>make-deno-edition</code> aliases <code>make-deno-edition/edition-es2020/index.js</code></li>
-<li><code>make-deno-edition/edition-es2020/index.js</code> is <a href="https://www.typescriptlang.org/" title="TypeScript is a typed superset of JavaScript that compiles to plain JavaScript. ">TypeScript</a> compiled against <a href="https://en.wikipedia.org/wiki/ECMAScript#11th_Edition_–_ECMAScript_2020" title="ECMAScript ES2020">ES2020</a> for <a href="https://nodejs.org" title="Node.js is a JavaScript runtime built on Chrome's V8 JavaScript engine">Node.js</a> 10 || 12 || 14 with <a href="https://nodejs.org/dist/latest-v5.x/docs/api/modules.html" title="Node/CJS Modules">Require</a> for modules</li>
-<li><code>make-deno-edition/edition-es2020-esm/index.js</code> is <a href="https://www.typescriptlang.org/" title="TypeScript is a typed superset of JavaScript that compiles to plain JavaScript. ">TypeScript</a> compiled against <a href="https://en.wikipedia.org/wiki/ECMAScript#11th_Edition_–_ECMAScript_2020" title="ECMAScript ES2020">ES2020</a> for <a href="https://nodejs.org" title="Node.js is a JavaScript runtime built on Chrome's V8 JavaScript engine">Node.js</a> 12 || 14 with <a href="https://babeljs.io/docs/learn-es2015/#modules" title="ECMAScript Modules">Import</a> for modules</li></ul>
+<li><code>make-deno-edition</code> aliases <code>make-deno-edition/edition-es2022/index.js</code></li>
+<li><code>make-deno-edition/edition-es2022/index.js</code> is <a href="https://www.typescriptlang.org/" title="TypeScript is a typed superset of JavaScript that compiles to plain JavaScript. ">TypeScript</a> compiled against ES2022 for <a href="https://nodejs.org" title="Node.js is a JavaScript runtime built on Chrome's V8 JavaScript engine">Node.js</a> 18 || 20 || 21 with <a href="https://nodejs.org/dist/latest-v5.x/docs/api/modules.html" title="Node/CJS Modules">Require</a> for modules</li>
+<li><code>make-deno-edition/edition-es2022-esm/index.js</code> is <a href="https://www.typescriptlang.org/" title="TypeScript is a typed superset of JavaScript that compiles to plain JavaScript. ">TypeScript</a> compiled against ES2022 for <a href="https://nodejs.org" title="Node.js is a JavaScript runtime built on Chrome's V8 JavaScript engine">Node.js</a> 18 || 20 || 21 with <a href="https://babeljs.io/docs/learn-es2015/#modules" title="ECMAScript Modules">Import</a> for modules</li>
+<li><code>make-deno-edition/edition-types/index.d.ts</code> is <a href="https://www.typescriptlang.org/" title="TypeScript is a typed superset of JavaScript that compiles to plain JavaScript. ">TypeScript</a> compiled Types with <a href="https://babeljs.io/docs/learn-es2015/#modules" title="ECMAScript Modules">Import</a> for modules</li></ul>
 
 <!-- /INSTALL -->
 
@@ -219,14 +212,13 @@ These amazing people are maintaining this project:
 No sponsors yet! Will you be the first?
 
 <span class="badge-githubsponsors"><a href="https://github.com/sponsors/balupton" title="Donate to this project using GitHub Sponsors"><img src="https://img.shields.io/badge/github-donate-yellow.svg" alt="GitHub Sponsors donate button" /></a></span>
+<span class="badge-thanksdev"><a href="https://thanks.dev/u/gh/bevry" title="Donate to this project using ThanksDev"><img src="https://img.shields.io/badge/thanksdev-donate-yellow.svg" alt="ThanksDev donate button" /></a></span>
 <span class="badge-patreon"><a href="https://patreon.com/bevry" title="Donate to this project using Patreon"><img src="https://img.shields.io/badge/patreon-donate-yellow.svg" alt="Patreon donate button" /></a></span>
-<span class="badge-flattr"><a href="https://flattr.com/profile/balupton" title="Donate to this project using Flattr"><img src="https://img.shields.io/badge/flattr-donate-yellow.svg" alt="Flattr donate button" /></a></span>
 <span class="badge-liberapay"><a href="https://liberapay.com/bevry" title="Donate to this project using Liberapay"><img src="https://img.shields.io/badge/liberapay-donate-yellow.svg" alt="Liberapay donate button" /></a></span>
 <span class="badge-buymeacoffee"><a href="https://buymeacoffee.com/balupton" title="Donate to this project using Buy Me A Coffee"><img src="https://img.shields.io/badge/buy%20me%20a%20coffee-donate-yellow.svg" alt="Buy Me A Coffee donate button" /></a></span>
 <span class="badge-opencollective"><a href="https://opencollective.com/bevry" title="Donate to this project using Open Collective"><img src="https://img.shields.io/badge/open%20collective-donate-yellow.svg" alt="Open Collective donate button" /></a></span>
 <span class="badge-crypto"><a href="https://bevry.me/crypto" title="Donate to this project using Cryptocurrency"><img src="https://img.shields.io/badge/crypto-donate-yellow.svg" alt="crypto donate button" /></a></span>
 <span class="badge-paypal"><a href="https://bevry.me/paypal" title="Donate to this project using Paypal"><img src="https://img.shields.io/badge/paypal-donate-yellow.svg" alt="PayPal donate button" /></a></span>
-<span class="badge-wishlist"><a href="https://bevry.me/wishlist" title="Buy an item on our wishlist for us"><img src="https://img.shields.io/badge/wishlist-donate-yellow.svg" alt="Wishlist browse button" /></a></span>
 
 <h3>Contributors</h3>
 
@@ -249,6 +241,6 @@ Unless stated otherwise all works are:
 
 and licensed under:
 
-<ul><li><a href="http://spdx.org/licenses/MIT.html">MIT License</a></li></ul>
+<ul><li><a href="http://spdx.org/licenses/Artistic-2.0.html">Artistic License 2.0</a></li></ul>
 
 <!-- /LICENSE -->
