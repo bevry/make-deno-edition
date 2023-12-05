@@ -1,7 +1,7 @@
 /* eslint new-cap:0, no-loop-func:0, camelcase:0, no-use-before-define:0  */
 
 // builtin
-import { resolve, join, extname, dirname } from 'path'
+import { resolve, join, extname, dirname, sep } from 'path'
 
 // external
 import list from '@bevry/fs-list'
@@ -11,7 +11,6 @@ import readFile from '@bevry/fs-read'
 import writeFile from '@bevry/fs-write'
 import { readJSON, writeJSON } from '@bevry/json'
 import Errlop from 'errlop'
-import mkdirp from 'mkdirp'
 import spawn from 'await-spawn'
 
 // local
@@ -480,7 +479,7 @@ export async function make({
 	// add the files
 	await Promise.all(
 		paths.map(async (path) => {
-			const filename = path.replace(sourceEditionPath + '/', '')
+			const filename = path.replace(sourceEditionPath + sep, '')
 			const source = await readFile(path)
 			let necessary: boolean
 			let label: string

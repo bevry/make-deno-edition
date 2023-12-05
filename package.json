@@ -1,11 +1,10 @@
 {
   "name": "make-deno-edition",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Automatically makes package.json projects (such as npm packages and node.js modules) compatible with Deno.",
   "homepage": "https://github.com/bevry/make-deno-edition",
   "license": "Artistic-2.0",
   "keywords": [
-    "deno",
     "denoify",
     "edition",
     "editions",
@@ -206,7 +205,8 @@
   "prettier": {
     "semi": false,
     "singleQuote": true,
-    "trailingComma": "all"
+    "trailingComma": "all",
+    "endOfLine": "lf"
   },
   "boundation": {
     "maintainedNodeVersions": true,
