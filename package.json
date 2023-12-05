@@ -1,6 +1,6 @@
 {
   "name": "make-deno-edition",
-  "version": "2.0.1",
+  "version": "2.1.0",
   "description": "Automatically makes package.json projects (such as npm packages and node.js modules) compatible with Deno.",
   "homepage": "https://github.com/bevry/make-deno-edition",
   "license": "Artistic-2.0",
@@ -87,7 +87,7 @@
       "engines": false
     },
     {
-      "description": "TypeScript compiled against ES2022 for Node.js 18 || 20 || 21 with Require for modules",
+      "description": "TypeScript compiled against ES2022 for Node.js 21 with Require for modules",
       "directory": "edition-es2022",
       "entry": "index.js",
       "tags": [
@@ -102,7 +102,7 @@
       }
     },
     {
-      "description": "TypeScript compiled against ES2022 for Node.js 18 || 20 || 21 with Import for modules",
+      "description": "TypeScript compiled against ES2022 for Node.js 21 with Import for modules",
       "directory": "edition-es2022-esm",
       "entry": "index.js",
       "tags": [
@@ -140,34 +140,33 @@
     }
   },
   "dependencies": {
-    "@bevry/ansi": "^6.4.0",
-    "@bevry/fs-list": "^2.2.0",
-    "@bevry/fs-read": "^1.2.0",
-    "@bevry/fs-readable": "^2.1.0",
-    "@bevry/fs-remove": "^1.2.0",
-    "@bevry/fs-write": "^1.2.0",
-    "@bevry/json": "^2.0.0",
+    "@bevry/ansi": "^6.7.0",
+    "@bevry/fs-list": "^2.4.0",
+    "@bevry/fs-read": "^1.4.0",
+    "@bevry/fs-readable": "^2.3.0",
+    "@bevry/fs-remove": "^1.4.0",
+    "@bevry/fs-write": "^1.4.0",
+    "@bevry/json": "^2.2.0",
     "await-spawn": "^4.0.2",
-    "errlop": "^7.3.0",
-    "get-cli-arg": "^8.2.0"
+    "errlop": "^8.2.0",
+    "get-cli-arg": "^8.4.0"
   },
   "devDependencies": {
     "@bevry/update-contributors": "^1.23.0",
-    "@types/node": "^20.10.0",
-    "@typescript-eslint/eslint-plugin": "^6.12.0",
-    "@typescript-eslint/parser": "^6.12.0",
-    "assert-helpers": "^11.5.0",
-    "eslint": "^8.54.0",
-    "eslint-config-bevry": "^5.1.0",
-    "eslint-config-prettier": "^9.0.0",
+    "@types/node": "^20.10.3",
+    "@typescript-eslint/eslint-plugin": "^6.13.2",
+    "@typescript-eslint/parser": "^6.13.2",
+    "assert-helpers": "^11.9.0",
+    "eslint": "^8.55.0",
+    "eslint-config-bevry": "^5.3.0",
+    "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.0.1",
-    "kava": "^7.3.0",
+    "kava": "^7.5.0",
     "prettier": "^3.1.0",
-    "projectz": "^3.3.0",
-    "surge": "^0.23.1",
-    "typedoc": "^0.25.3",
-    "typescript": "5.2.2",
-    "valid-directory": "^4.5.0"
+    "projectz": "^3.4.0",
+    "typedoc": "^0.25.4",
+    "typescript": "5.3.2",
+    "valid-directory": "^4.6.0"
   },
   "scripts": {
     "our:bin": "node ./bin.cjs",

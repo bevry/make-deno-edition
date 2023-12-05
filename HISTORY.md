@@ -1,5 +1,9 @@
 # History
 
+## v2.1.0 2023 December 6
+
+-   Updated dependencies, [base files](https://github.com/bevry/base), and [editions](https://editions.bevry.me) using [boundation](https://github.com/bevry/boundation)
+
 ## v2.0.1 2023 December 5
 
 -   Add Windows compatibility
