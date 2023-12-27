@@ -1,9 +1,8 @@
 <!-- TITLE/ -->
 
-<h1>make-deno-edition</h1>
+# make-deno-edition
 
 <!-- /TITLE -->
-
 
 <!-- BADGES/ -->
 
@@ -24,7 +23,6 @@
 <span class="badge-twitch"><a href="https://www.twitch.tv/balupton" title="Join this project's community on Twitch"><img src="https://img.shields.io/twitch/status/balupton?logo=twitch" alt="Twitch community badge" /></a></span>
 
 <!-- /BADGES -->
-
 
 <!-- DESCRIPTION/ -->
 
@@ -150,66 +148,62 @@ You can also instruct consumers of your package to directly use your deno editio
 
 <!-- INSTALL/ -->
 
-<h2>Install</h2>
+## Install
 
-<a href="https://npmjs.com" title="npm is a package manager for javascript"><h3>npm</h3></a>
-<h4>Install Globally</h4>
-<ul>
-<li>Install: <code>npm install --global make-deno-edition</code></li>
-<li>Executable: <code>make-deno-edition</code></li>
-</ul>
-<h4>Install Locally</h4>
-<ul>
-<li>Install: <code>npm install --save make-deno-edition</code></li>
-<li>Executable: <code>npx make-deno-edition</code></li>
-<li>Import: <code>import * as pkg from ('make-deno-edition')</code></li>
-<li>Require: <code>const pkg = require('make-deno-edition')</code></li>
-</ul>
+### [npm](https://npmjs.com "npm is a package manager for javascript")
 
-<h3><a href="https://editions.bevry.me" title="Editions are the best way to produce and consume packages you care about.">Editions</a></h3>
+#### Install Globally
 
-<p>This package is published with the following editions:</p>
+-   Install: `npm install --global make-deno-edition`
+-   Executable: `make-deno-edition`
 
-<ul><li><code>make-deno-edition/source/index.ts</code> is <a href="https://www.typescriptlang.org/" title="TypeScript is a typed superset of JavaScript that compiles to plain JavaScript. ">TypeScript</a> source code with <a href="https://babeljs.io/docs/learn-es2015/#modules" title="ECMAScript Modules">Import</a> for modules</li>
-<li><code>make-deno-edition</code> aliases <code>make-deno-edition/edition-es2022/index.js</code></li>
-<li><code>make-deno-edition/edition-es2022/index.js</code> is <a href="https://www.typescriptlang.org/" title="TypeScript is a typed superset of JavaScript that compiles to plain JavaScript. ">TypeScript</a> compiled against ES2022 for <a href="https://nodejs.org" title="Node.js is a JavaScript runtime built on Chrome's V8 JavaScript engine">Node.js</a> 21 with <a href="https://nodejs.org/dist/latest-v5.x/docs/api/modules.html" title="Node/CJS Modules">Require</a> for modules</li>
-<li><code>make-deno-edition/edition-es2022-esm/index.js</code> is <a href="https://www.typescriptlang.org/" title="TypeScript is a typed superset of JavaScript that compiles to plain JavaScript. ">TypeScript</a> compiled against ES2022 for <a href="https://nodejs.org" title="Node.js is a JavaScript runtime built on Chrome's V8 JavaScript engine">Node.js</a> 21 with <a href="https://babeljs.io/docs/learn-es2015/#modules" title="ECMAScript Modules">Import</a> for modules</li>
-<li><code>make-deno-edition/edition-types/index.d.ts</code> is <a href="https://www.typescriptlang.org/" title="TypeScript is a typed superset of JavaScript that compiles to plain JavaScript. ">TypeScript</a> compiled Types with <a href="https://babeljs.io/docs/learn-es2015/#modules" title="ECMAScript Modules">Import</a> for modules</li></ul>
+#### Install Locally
+
+-   Install: `npm install --save make-deno-edition`
+-   Executable: `npx make-deno-edition`
+-   Import: `import * as pkg from ('make-deno-edition')`
+-   Require: `const pkg = require('make-deno-edition')`
+
+### [Editions](https://editions.bevry.me "Editions are the best way to produce and consume packages you care about.")
+
+This package is published with the following editions:
+-   `make-deno-edition/source/index.ts` is [TypeScript](https://www.typescriptlang.org/ "TypeScript is a typed superset of JavaScript that compiles to plain JavaScript.") source code with [Import](https://babeljs.io/docs/learn-es2015/#modules "ECMAScript Modules") for modules
+-   `make-deno-edition` aliases `make-deno-edition/edition-es2022/index.js`
+-   `make-deno-edition/edition-es2022/index.js` is [TypeScript](https://www.typescriptlang.org/ "TypeScript is a typed superset of JavaScript that compiles to plain JavaScript.") compiled against [ES2022](https://en.wikipedia.org/wiki/ES2022 "ECMAScript 2022") for [Node.js](https://nodejs.org "Node.js is a JavaScript runtime built on Chrome's V8 JavaScript engine") 18 || 20 || 21 with [Require](https://nodejs.org/dist/latest-v5.x/docs/api/modules.html "Node/CJS Modules") for modules
+-   `make-deno-edition/edition-es2022-esm/index.js` is [TypeScript](https://www.typescriptlang.org/ "TypeScript is a typed superset of JavaScript that compiles to plain JavaScript.") compiled against [ES2022](https://en.wikipedia.org/wiki/ES2022 "ECMAScript 2022") for [Node.js](https://nodejs.org "Node.js is a JavaScript runtime built on Chrome's V8 JavaScript engine") 18 || 20 || 21 with [Import](https://babeljs.io/docs/learn-es2015/#modules "ECMAScript Modules") for modules
+-   `make-deno-edition/edition-types/index.d.ts` is [TypeScript](https://www.typescriptlang.org/ "TypeScript is a typed superset of JavaScript that compiles to plain JavaScript.") compiled Types with [Import](https://babeljs.io/docs/learn-es2015/#modules "ECMAScript Modules") for modules
 
 <!-- /INSTALL -->
 
-
 <!-- HISTORY/ -->
 
-<h2>History</h2>
+## History
 
-<a href="https://github.com/bevry/make-deno-edition/blob/master/HISTORY.md#files">Discover the release history by heading on over to the <code>HISTORY.md</code> file.</a>
+[Discover the release history by heading on over to the `HISTORY.md` file.](https://github.com/bevry/make-deno-edition/blob/HEAD/HISTORY.md#files)
 
 <!-- /HISTORY -->
 
-
-<!-- CONTRIBUTE/ -->
-
-<h2>Contribute</h2>
-
-<a href="https://github.com/bevry/make-deno-edition/blob/master/CONTRIBUTING.md#files">Discover how you can contribute by heading on over to the <code>CONTRIBUTING.md</code> file.</a>
-
-<!-- /CONTRIBUTE -->
-
-
 <!-- BACKERS/ -->
 
-<h2>Backers</h2>
+## Backers
 
-<h3>Maintainers</h3>
+### Code
 
-These amazing people are maintaining this project:
+[Discover how to contribute via the `CONTRIBUTING.md` file.](https://github.com/bevry/make-deno-edition/blob/HEAD/CONTRIBUTING.md#files)
 
-<ul><li><a href="https://balupton.com">Benjamin Lupton</a> — <a href="https://github.com/bevry/make-deno-edition/commits?author=balupton" title="View the GitHub contributions of Benjamin Lupton on repository bevry/make-deno-edition">view contributions</a></li></ul>
+#### Authors
 
-<h3>Sponsors</h3>
+-   [Benjamin Lupton](https://balupton.com) — Accelerating collaborative wisdom.
 
-No sponsors yet! Will you be the first?
+#### Maintainers
+
+-   [Benjamin Lupton](https://github.com/balupton) — Accelerating collaborative wisdom.
+
+#### Contributors
+
+-   [Benjamin Lupton](https://github.com/balupton) — [view contributions](https://github.com/bevry/make-deno-edition/commits?author=balupton "View the GitHub contributions of Benjamin Lupton on repository bevry/make-deno-edition")
+
+### Finances
 
 <span class="badge-githubsponsors"><a href="https://github.com/sponsors/balupton" title="Donate to this project using GitHub Sponsors"><img src="https://img.shields.io/badge/github-donate-yellow.svg" alt="GitHub Sponsors donate button" /></a></span>
 <span class="badge-thanksdev"><a href="https://thanks.dev/u/gh/bevry" title="Donate to this project using ThanksDev"><img src="https://img.shields.io/badge/thanksdev-donate-yellow.svg" alt="ThanksDev donate button" /></a></span>
@@ -220,27 +214,45 @@ No sponsors yet! Will you be the first?
 <span class="badge-crypto"><a href="https://bevry.me/crypto" title="Donate to this project using Cryptocurrency"><img src="https://img.shields.io/badge/crypto-donate-yellow.svg" alt="crypto donate button" /></a></span>
 <span class="badge-paypal"><a href="https://bevry.me/paypal" title="Donate to this project using Paypal"><img src="https://img.shields.io/badge/paypal-donate-yellow.svg" alt="PayPal donate button" /></a></span>
 
-<h3>Contributors</h3>
+#### Sponsors
 
-These amazing people have contributed code to this project:
+-   [Andrew Nesbitt](https://nesbitt.io) — Software engineer and researcher
+-   [Balsa](https://balsa.com) — We're Balsa, and we're building tools for builders.
+-   [Codecov](https://codecov.io/) — Empower developers with tools to improve code quality and testing.
+-   [Poonacha Medappa](https://poonachamedappa.com)
+-   [Rob Morris](https://github.com/Rob-Morris)
+-   [Sentry](https://sentry.io) — Real-time crash reporting for your web apps, mobile apps, and games.
+-   [Syntax](https://syntax.fm) — Syntax Podcast
 
-<ul><li><a href="https://balupton.com">Benjamin Lupton</a> — <a href="https://github.com/bevry/make-deno-edition/commits?author=balupton" title="View the GitHub contributions of Benjamin Lupton on repository bevry/make-deno-edition">view contributions</a></li></ul>
+#### Donors
 
-<a href="https://github.com/bevry/make-deno-edition/blob/master/CONTRIBUTING.md#files">Discover how you can contribute by heading on over to the <code>CONTRIBUTING.md</code> file.</a>
+-   [Andrew Nesbitt](https://nesbitt.io)
+-   [Balsa](https://balsa.com)
+-   [Chad](https://opencollective.com/chad8)
+-   [Codecov](https://codecov.io/)
+-   [entroniq](https://gitlab.com/entroniq)
+-   [Jean-Luc Geering](https://github.com/jlgeering)
+-   [Michael Duane Mooring](https://mdm.cc)
+-   [Mohammed Shah](https://github.com/smashah)
+-   [Poonacha Medappa](https://poonachamedappa.com)
+-   [Rob Morris](https://github.com/Rob-Morris)
+-   [Sentry](https://sentry.io)
+-   [ServieJS](https://github.com/serviejs)
+-   [Skunk Team](https://skunk.team)
+-   [Syntax](https://syntax.fm)
 
 <!-- /BACKERS -->
 
-
 <!-- LICENSE/ -->
 
-<h2>License</h2>
+## License
 
 Unless stated otherwise all works are:
 
-<ul><li>Copyright &copy; 2020+ <a href="https://balupton.com">Benjamin Lupton</a></li></ul>
+-   Copyright &copy; [Benjamin Lupton](https://balupton.com)
 
 and licensed under:
 
-<ul><li><a href="http://spdx.org/licenses/Artistic-2.0.html">Artistic License 2.0</a></li></ul>
+-   [Artistic License 2.0](http://spdx.org/licenses/Artistic-2.0.html)
 
 <!-- /LICENSE -->
